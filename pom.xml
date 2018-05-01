@@ -4,11 +4,12 @@
 	<groupId>org.q4s</groupId>
 	<artifactId>dafobi</artifactId>
 	<name>dafobi</name>
-	<version>${project.version}</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<modules>
 		<module>transaction</module>
+		<module>common</module>
 	</modules>
 
 	<properties>
