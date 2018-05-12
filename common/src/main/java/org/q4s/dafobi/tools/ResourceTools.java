@@ -140,7 +140,8 @@ public class ResourceTools {
 			content = loadStream(inputStream, charsetName);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Ошибка при загрузке файла", e);
+			throw new RuntimeException("Ошибка при загрузке файла "
+					+ file.getAbsolutePath(), e);
 
 		}
 		return content;
@@ -183,7 +184,8 @@ public class ResourceTools {
 			content = loadStreamRows(inputStream, charsetName, rows);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Ошибка при загрузке файла", e);
+			throw new RuntimeException("Ошибка при загрузке файла"
+					+ file.getAbsolutePath(), e);
 		}
 		return content;
 	}
