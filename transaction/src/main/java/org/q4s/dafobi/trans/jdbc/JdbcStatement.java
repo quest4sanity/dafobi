@@ -59,9 +59,10 @@ public class JdbcStatement extends AbstractStatement {
 	private final String parsedQuery;
 
 	/**
-	 * Запрос, из которого в дополнение ко всему удалены комментарии.
+	 * Запрос, из которого в дополнение ко всему удалены комментарии, а так же
+	 * сделана другая возможная постобработка.
 	 */
-	private final String cleanQuery;
+	private final String processedQuery;
 
 	/**
 	 * @see JdbcStatement
@@ -82,16 +83,13 @@ public class JdbcStatement extends AbstractStatement {
 			parsedQuery = parse(query.replaceAll("^\\s+", ""), indexMap,
 					inOutParams);
 
-			cleanQuery = dropComment(parsedQuery).replaceAll("\\s+", " ")
-					.trim();
+			// Выполним необязательную постобработку запроса. По-умолчанию она
+			// включает в себя только удаление комментариев.
+			processedQuery = processQuery(parsedQuery);
 
-			// Запрос автоматически определяется как Callable, если он имеет
-			// формат "{call ...}" или "[declare ... ]begin ... end".
-			// TODO Конструкция BEGIN-END существует только в Oracle
+			// Процедурные запрос и обычные отрабатываются по разному.
 			Connection connection = transaction.getConnection();
-			if ("{call".equalsIgnoreCase(cleanQuery.substring(0, 5))
-					|| "begin".equalsIgnoreCase(cleanQuery.substring(0, 5))
-					|| "declare".equalsIgnoreCase(cleanQuery.substring(0, 7))) {
+			if (isQueryCallable()) {
 				statement = connection.prepareCall(parsedQuery);
 
 			} else {
@@ -99,8 +97,35 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
+	}
+
+	/**
+	 * Метод выполняется в цикле конструктора оператора. В него можно внести
+	 * код, который допиливает запрос под особености драйвера JDBC.
+	 * 
+	 * @param sourceQuery
+	 *            Запрос, в котором все имена параметров заменены на знаки ?
+	 * 
+	 * @return Запрос, после всех произведенных допиливаний.
+	 */
+	protected String processQuery(String sourceQuery) {
+		return dropComment(sourceQuery).replaceAll("\\s+", " ").trim();
+	}
+
+	/**
+	 * Метод выполняется в цикле конструктора оператора. В него можно внести
+	 * код, который определит, является запрос вызовом процедуры (и могут ли по
+	 * нему возвращаться выходные значения) или нет.
+	 * 
+	 * @return true - если запрос является вызовом процедуры (или аналогом);
+	 *         false - если это обычный запрос к базе.
+	 */
+	protected boolean isQueryCallable() {
+		// Запрос автоматически определяется как Callable, если он имеет
+		// формат "{call ...}"
+		return "{call".equalsIgnoreCase(processedQuery.substring(0, 5));
 	}
 
 	/**
@@ -232,7 +257,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @throws IllegalArgumentException
 	 *             if the parameter does not exist
 	 */
-	protected int[] getIndexes(String name) {
+	protected final int[] getIndexes(String name) {
 		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
 		if (indexes == null) {
 			throw new IllegalArgumentException("Parameter not found: " + name);
@@ -243,15 +268,18 @@ public class JdbcStatement extends AbstractStatement {
 	/**
 	 * @return the parsedQuery
 	 */
-	public String getParsedQuery() {
+	public final String getParsedQuery() {
 		return parsedQuery;
 	}
 
 	/**
-	 * @return the cleanQuery
+	 * Мето возвращает запрос, из которого были удалены комментарии, а так же
+	 * над которым могла быть произведена специфичная для драйвера обработка.
+	 * 
+	 * @return the processedQuery
 	 */
-	public String getCleanQuery() {
-		return cleanQuery;
+	public final String getProcessedQuery() {
+		return processedQuery;
 	}
 
 	/*
@@ -260,7 +288,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#getParameters()
 	 */
 	@Override
-	public String[] getParamNames() {
+	public final String[] getParamNames() {
 		return indexMap.keySet().toArray(new String[0]);
 	}
 
@@ -270,7 +298,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#getOutParameters()
 	 */
 	@Override
-	public String[] getOutParamNames() {
+	public final String[] getOutParamNames() {
 		if (statement instanceof CallableStatement) {
 			return inOutParams.keySet().toArray(new String[0]);
 
@@ -435,7 +463,7 @@ public class JdbcStatement extends AbstractStatement {
 			// }
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
 	}
 
@@ -450,7 +478,7 @@ public class JdbcStatement extends AbstractStatement {
 			return statement.execute();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
 	}
 
@@ -465,7 +493,7 @@ public class JdbcStatement extends AbstractStatement {
 			return statement.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
 	}
 
@@ -480,7 +508,7 @@ public class JdbcStatement extends AbstractStatement {
 			statement.addBatch();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
 	}
 
@@ -495,7 +523,7 @@ public class JdbcStatement extends AbstractStatement {
 			return statement.executeBatch();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+			throw new TransactionException(e, getProcessedQuery());
 		}
 	}
 

@@ -75,7 +75,7 @@ public class JdbcStatementInternalTest {
 			assertEquals("SELECT * FROM TEST WHERE ID = ?",
 					statement.getParsedQuery());
 			assertEquals("SELECT * FROM TEST WHERE ID = ?",
-					statement.getCleanQuery());
+					statement.getProcessedQuery());
 			assertArrayEquals(new String[] { "ID" }, statement.getParamNames());
 			assertArrayEquals(new String[] {}, statement.getOutParamNames());
 		}
@@ -97,7 +97,7 @@ public class JdbcStatementInternalTest {
 					+ "WHERE ID = ? OR ID = ? OR ID = ?",
 					statement.getParsedQuery());
 			assertEquals("SELECT * FROM TEST WHERE ID = ? OR ID = ? OR ID = ?",
-					statement.getCleanQuery());
+					statement.getProcessedQuery());
 
 			String[] params = statement.getParamNames();
 			Arrays.sort(params);

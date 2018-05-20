@@ -217,7 +217,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getCleanQuery()}.
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getProcessedQuery()}.
 	 */
 	@Test
 	public void testGetCleanQuery() {
