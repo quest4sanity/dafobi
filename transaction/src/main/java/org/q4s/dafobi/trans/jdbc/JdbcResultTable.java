@@ -31,7 +31,7 @@ public class JdbcResultTable extends AbstractResultTable {
 			for (int i = 1; i <= count; i++) {
 				// TODO Надо тщательно проверить, как этот код работает
 				addColumnInfo(meta.getColumnName(i),
-						DataType.typeOf(meta.getColumnType(i)));
+						DataType.valueOf(meta.getColumnType(i)));
 			}
 			protect();
 

@@ -18,6 +18,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.q4s.dafobi.trans.DataType;
 import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IRow;
 import org.q4s.dafobi.trans.IStatement;
@@ -69,6 +70,7 @@ public class JdbcStatementTest {
 	PreparedStatement insertStatement;
 
 	/**
+	 * Метод добавляет начальные строки в тестовую таблицу.
 	 * 
 	 * @throws java.lang.Exception
 	 */
@@ -93,6 +95,7 @@ public class JdbcStatementTest {
 	}
 
 	/**
+	 * Метод опустошает тестовую таблицу.
 	 * 
 	 * @throws java.lang.Exception
 	 */
@@ -127,8 +130,8 @@ public class JdbcStatementTest {
 	}
 
 	private Long getRowCount() {
-		IRow row = getOneRow("SELECT count(*) FROM TEST");
-		return row.getInteger(0);
+		IRow row = getOneRow("SELECT count(*) as c FROM TEST");
+		return row.getInteger("c");
 	}
 
 	/**
@@ -146,7 +149,7 @@ public class JdbcStatementTest {
 	public void testQuery1() {
 		try (IStatement statement = transaction
 				.prepare("SELECT * FROM TEST WHERE ID = :id");) {
-			statement.setLong("id", new Long(2));
+			statement.setParam("id", DataType.LONG.param(2l));
 			try (IResultTable result = statement.query();) {
 				int i = 0;
 				for (IRow row : result) {

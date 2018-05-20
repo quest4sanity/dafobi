@@ -28,7 +28,6 @@ public abstract class AbstractResultTable implements IResultTable {
 			this.name = name;
 			this.type = type;
 		}
-
 	}
 
 	private List<ColumnMetaInfo> columnMetaList = new ArrayList<ColumnMetaInfo>();
@@ -127,7 +126,7 @@ public abstract class AbstractResultTable implements IResultTable {
 			throw new RuntimeException();
 		}
 		for (int i = 0; i < columnMeta.length; i++) {
-			if (columnMeta[i].equals(name)) {
+			if (columnMeta[i].name.equalsIgnoreCase(name)) {
 				return i;
 			}
 		}

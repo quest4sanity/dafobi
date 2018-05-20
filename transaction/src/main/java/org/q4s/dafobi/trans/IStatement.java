@@ -1,10 +1,6 @@
 package org.q4s.dafobi.trans;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,8 +9,8 @@ import org.q4s.dafobi.exception.TransactionException;
 /**
  * Оператор, получающий строки данных из базы или любого другого хранилища.
  * <p>
- * Оператор может содержать в тексте именованные параметры. Входящие параметры
- * обозначаются как <i>:имя_параметра</i>. Выходящие параметры (куда будут
+ * Оператор может содержать в тексте именованные параметры. Входные параметры
+ * обозначаются как <i>:имя_параметра</i>. Выходные параметры (куда будут
  * помещаться результаты обработки запроса) обозначаются как
  * <i>&имя_параметра</i>.
  * 
@@ -41,7 +37,7 @@ public interface IStatement extends AutoCloseable {
 	 */
 	public IResultTable query();
 
-	public IResultTable query(final Map<String, Object> parameters);
+	public IResultTable query(final Map<String, DataParam> parameters);
 
 	/**
 	 * Executes the statement, which must be an SQL INSERT, UPDATE or DELETE
@@ -55,7 +51,7 @@ public interface IStatement extends AutoCloseable {
 	 */
 	public int executeUpdate();
 
-	public int executeUpdate(final Map<String, Object> parameters);
+	public int executeUpdate(final Map<String, DataParam> parameters);
 
 	/**
 	 * Executes the statement.
@@ -67,7 +63,7 @@ public interface IStatement extends AutoCloseable {
 	 */
 	public boolean execute();
 
-	public boolean execute(final Map<String, Object> parameters);
+	public boolean execute(final Map<String, DataParam> parameters);
 
 	/**
 	 * Adds the current set of parameters as a batch entry.
@@ -77,7 +73,7 @@ public interface IStatement extends AutoCloseable {
 	 */
 	public void addBatch();
 
-	public void addBatch(final Map<String, Object> parameters);
+	public void addBatch(final Map<String, DataParam> parameters);
 
 	/**
 	 * Executes all of the batched statements.
@@ -93,7 +89,7 @@ public interface IStatement extends AutoCloseable {
 
 	/**
 	 * Возвращает набор имен параметров, которые ожидает запрос. В этот набор
-	 * входят как входящие, так и выходные параметры.
+	 * входят как входные, так и выходные параметры.
 	 * 
 	 * @return Имена параметров запроса.
 	 */
@@ -124,131 +120,8 @@ public interface IStatement extends AutoCloseable {
 	 * @throws IllegalArgumentException
 	 *             if the parameter does not exist
 	 */
-	public void setObject(String name, Object value);
+	public void setParam(String name, DataParam value);
 
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @param sqlType
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 * 
-	 * @see PreparedStatement#setObject(int, java.lang.Object)
-	 */
-	public void setObject(String name, Object value, int sqlType);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setString(String name, String value);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setInt(String name, Integer value);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setLong(String name, Long value);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setDate(String name, Date value);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setTime(String name, Time value);
-
-	/**
-	 * Sets a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @param value
-	 *            parameter value
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	public void setTimestamp(String name, Timestamp value);
-
-	public Object getObject(String name);
+	public Object getParam(String name, DataType type);
 
 }

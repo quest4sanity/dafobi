@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 
 import org.q4s.dafobi.exception.TransactionException;
 import org.q4s.dafobi.trans.AbstractStatement;
+import org.q4s.dafobi.trans.DataParam;
+import org.q4s.dafobi.trans.DataType;
 import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IStatement;
 
@@ -36,23 +38,42 @@ public class JdbcStatement extends AbstractStatement {
 
 	private final JdbcTransaction transaction;
 
-	/** The statement this object is wrapping. */
+	/**
+	 * The statement this object is wrapping.
+	 */
 	private final PreparedStatement statement;
 
-	/** Maps parameter names to arrays of ints which are the parameter indices. */
+	/**
+	 * Maps all parameter names to arrays of ints which are the parameter
+	 * indices.
+	 */
 	private final Map<String, int[]> indexMap;
 
+	/**
+	 * Maps out parameter names to arrays of ints which are the parameter
+	 * indices.
+	 */
 	private final Map<String, Integer> inOutParams;
 
+	/**
+	 * Запрос, превращенный в форму, пригодную для использования в JDBC.
+	 */
 	private final String parsedQuery;
 
+	/**
+	 * Запрос, из которого в дополнение ко всему удалены комментарии.
+	 */
 	private final String cleanQuery;
 
+	/**
+	 * @see JdbcStatement
+	 * 
+	 * @param transaction
+	 * @param query
+	 */
 	public JdbcStatement(final JdbcTransaction transaction, final String query) {
 		try {
 			this.transaction = transaction;
-
-			Connection connection = transaction.getConnection();
 
 			indexMap = new HashMap<String, int[]>();
 			inOutParams = new HashMap<String, Integer>();
@@ -69,6 +90,7 @@ public class JdbcStatement extends AbstractStatement {
 			// Запрос автоматически определяется как Callable, если он имеет
 			// формат "{call ...}" или "[declare ... ]begin ... end".
 			// TODO Конструкция BEGIN-END существует только в Oracle
+			Connection connection = transaction.getConnection();
 			if ("{call".equalsIgnoreCase(cleanQuery.substring(0, 5))
 					|| "begin".equalsIgnoreCase(cleanQuery.substring(0, 5))
 					|| "declare".equalsIgnoreCase(cleanQuery.substring(0, 7))) {
@@ -81,25 +103,6 @@ public class JdbcStatement extends AbstractStatement {
 		} catch (SQLException e) {
 			throw new TransactionException(e, getCleanQuery());
 		}
-	}
-
-	/**
-	 * Returns the indexes for a parameter.
-	 * 
-	 * @param name
-	 *            parameter name
-	 * 
-	 * @return parameter indexes
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	protected int[] getIndexes(String name) {
-		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
-		if (indexes == null) {
-			throw new IllegalArgumentException("Parameter not found: " + name);
-		}
-		return indexes;
 	}
 
 	/**
@@ -371,12 +374,12 @@ public class JdbcStatement extends AbstractStatement {
 	 * @param sqlType
 	 *            Тип данных параметра (как он определен в {@link Types}).
 	 */
-	public void registerOutParameter(String name, int sqlType) {
+	public void registerOutParameter(String name, DataType type) {
 		if (statement instanceof CallableStatement) {
 			try {
 				int index = inOutParams.get(name.toUpperCase());
 				((CallableStatement) statement).registerOutParameter(index,
-						sqlType);
+						type.jdbcType());
 
 			} catch (SQLException e) {
 				throw new IllegalArgumentException(e);
@@ -419,51 +422,40 @@ public class JdbcStatement extends AbstractStatement {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns the indexes for a name of parameter.
 	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setObject(java.lang.String,
-	 * java.lang.Object)
+	 * @param name
+	 *            parameter's name
+	 * 
+	 * @return parameter's indexes
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the parameter does not exist
 	 */
-	@Override
-	public void setObject(String name, Object value) {
-		try {
-			int[] indexes = getIndexes(name.toUpperCase());
-			for (int i = 0; i < indexes.length; i++) {
-				if (value instanceof Clob) {
-					statement.setClob(indexes[i], (Clob) value);
-
-				} else if (value instanceof Timestamp) {
-					// С полем Timestamp в Oracle происходит хрень.
-					// Купируем баг путем перевода в другой тип.
-					statement.setObject(indexes[i], new Date(
-							((Timestamp) value).getTime()));
-				} else {
-					statement.setObject(indexes[i], value);
-					// statement.setBigDecimal(indexes[i], (BigDecimal) value);
-				}
-			}
-
-		} catch (IllegalArgumentException e) {
-			// Просто пропускаем случаи, когда параметр устанавливается зря.
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
+	protected int[] getIndexes(String name) {
+		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
+		if (indexes == null) {
+			throw new IllegalArgumentException("Parameter not found: " + name);
 		}
+		return indexes;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setObject(java.lang.String,
-	 * java.lang.Object, int)
+	 * @see org.q4s.dafobi.trans.AbstractStatement#setParam(java.lang.String,
+	 * org.q4s.dafobi.trans.DataParam)
 	 */
 	@Override
-	public void setObject(String name, Object value, int sqlType) {
+	public void setParam(String name, DataParam param) {
+		super.setParam(name, param);
+
 		try {
 			int[] indexes = getIndexes(name.toUpperCase());
 			for (int i = 0; i < indexes.length; i++) {
-				switch (sqlType) {
+				Object value = param.getValue();
+				switch (param.getType().jdbcType()) {
 				case Types.CLOB:
 					statement.setClob(indexes[i], value == null ? null
 							: (Clob) value);
@@ -472,6 +464,16 @@ public class JdbcStatement extends AbstractStatement {
 				case Types.VARCHAR:
 					statement.setString(indexes[i], value == null ? null
 							: (String) value);
+					break;
+
+				case Types.INTEGER:
+					statement.setInt(indexes[i], value == null ? null
+							: (Integer) value);
+					break;
+
+				case Types.BIGINT:
+					statement.setLong(indexes[i], value == null ? null
+							: (Long) value);
 					break;
 
 				case Types.NUMERIC:
@@ -497,8 +499,9 @@ public class JdbcStatement extends AbstractStatement {
 					break;
 
 				default:
-					throw new RuntimeException("Тип данных" + sqlType
-							+ " не поддерживается.");
+					throw new UnsupportedOperationException(new StringBuilder(
+							"Тип данных").append(param.getClass().getName())
+							.append(" не поддерживается.").toString());
 				}
 			}
 
@@ -513,122 +516,11 @@ public class JdbcStatement extends AbstractStatement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setString(java.lang.String,
-	 * java.lang.String)
+	 * @see org.q4s.dafobi.trans.IStatement#getParam(java.lang.String,
+	 * org.q4s.dafobi.trans.DataType)
 	 */
 	@Override
-	public void setString(String name, String value) {
-		try {
-			int[] indexes = getIndexes(name.toUpperCase());
-			for (int i = 0; i < indexes.length; i++) {
-				statement.setString(indexes[i], value);
-			}
-
-		} catch (IllegalArgumentException e) {
-			// Просто пропускаем случаи, когда параметр устанавливается зря.
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setInt(java.lang.String,
-	 * java.lang.Integer)
-	 */
-	@Override
-	public void setInt(String name, Integer value) {
-		try {
-			int[] indexes = getIndexes(name.toUpperCase());
-			for (int i = 0; i < indexes.length; i++) {
-				statement.setInt(indexes[i], value);
-			}
-
-		} catch (IllegalArgumentException e) {
-			// Просто пропускаем случаи, когда параметр устанавливается зря.
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setLong(java.lang.String,
-	 * java.lang.Long)
-	 */
-	@Override
-	public void setLong(String name, Long value) {
-		try {
-			int[] indexes = getIndexes(name.toUpperCase());
-			for (int i = 0; i < indexes.length; i++) {
-				statement.setLong(indexes[i], value);
-			}
-
-		} catch (IllegalArgumentException e) {
-			// Просто пропускаем случаи, когда параметр устанавливается зря.
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setDate(java.lang.String,
-	 * java.sql.Date)
-	 */
-	@Override
-	public void setDate(String name, Date value) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setTime(java.lang.String,
-	 * java.sql.Time)
-	 */
-	@Override
-	public void setTime(String name, Time value) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#setTimestamp(java.lang.String,
-	 * java.sql.Timestamp)
-	 */
-	@Override
-	public void setTimestamp(String name, Timestamp value) {
-		try {
-			int[] indexes = getIndexes(name.toUpperCase());
-			for (int i = 0; i < indexes.length; i++) {
-				statement.setTimestamp(indexes[i], value);
-			}
-
-		} catch (IllegalArgumentException e) {
-			// Просто пропускаем случаи, когда параметр устанавливается зря.
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#getObject(java.lang.String)
-	 */
-	@Override
-	public Object getObject(String name) {
+	public Object getParam(String name, DataType type) {
 		try {
 			Integer index = inOutParams.get(name.toUpperCase());
 			if (index != null) {

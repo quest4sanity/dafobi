@@ -28,7 +28,7 @@ public abstract class AbstractTransaction implements ITransaction {
 	 */
 	@Override
 	public final int executeUpdate(final String statement,
-			final Map<String, Object> parameters) {
+			final Map<String, DataParam> parameters) {
 		int count;
 		
 		try (IStatement stmt = prepare(statement);) {
@@ -57,7 +57,7 @@ public abstract class AbstractTransaction implements ITransaction {
 	 */
 	@Override
 	public final boolean execute(final String statement,
-			final Map<String, Object> parameters) {
+			final Map<String, DataParam> parameters) {
 		boolean rc;
 		try (IStatement stmt = prepare(statement);) {
 			rc = stmt.execute(parameters);
@@ -87,7 +87,7 @@ public abstract class AbstractTransaction implements ITransaction {
 	 */
 	@Override
 	public Iterable<IRow> query(final String statement,
-			final Map<String, Object> parameters) {
+			final Map<String, DataParam> parameters) {
 		Iterable<IRow> result = null;
 		try (IStatement stmt = prepare(statement);) {
 			result = stmt.query(parameters);

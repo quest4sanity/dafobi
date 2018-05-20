@@ -24,7 +24,7 @@ public interface ITransaction extends AutoCloseable {
 	public IStatement prepare(final String statement);
 
 	public int executeUpdate(final String statement,
-			final Map<String, Object> parameters);
+			final Map<String, DataParam> parameters);
 
 	/**
 	 * @deprecated Похоже, не удастся реализовать очистку ресурсов.
@@ -34,7 +34,7 @@ public interface ITransaction extends AutoCloseable {
 	 * @return
 	 */
 	public boolean execute(final String statement,
-			final Map<String, Object> parameters);
+			final Map<String, DataParam> parameters);
 
 	/**
 	 * @deprecated Похоже, не удастся реализовать очистку ресурсов.
@@ -44,7 +44,7 @@ public interface ITransaction extends AutoCloseable {
 	 * @return
 	 */
 	public Iterable<IRow> query(final String statement,
-			final Map<String, Object> parameters);
+			final Map<String, DataParam> parameters);
 
 	public void setAutocommit(boolean flag);
 
