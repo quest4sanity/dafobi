@@ -226,7 +226,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParameters()}.
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParamNames()}.
 	 */
 	@Test
 	public void testGetParameters() {
@@ -235,7 +235,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getOutParameters()}.
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getOutParamNames()}.
 	 */
 	@Test
 	public void testGetOutParameters() {

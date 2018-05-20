@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ HsqldbTest.class, //
+		JdbcStatementInternalTest.class, //
 		JdbcStatementTest.class })
 public class AllJdbcTests {
 

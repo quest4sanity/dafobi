@@ -2,7 +2,6 @@ package org.q4s.dafobi.trans;
 
 import java.sql.Statement;
 import java.util.Map;
-import java.util.Set;
 
 import org.q4s.dafobi.exception.TransactionException;
 
@@ -93,7 +92,7 @@ public interface IStatement extends AutoCloseable {
 	 * 
 	 * @return Имена параметров запроса.
 	 */
-	public Set<String> getParameters();
+	public String[] getParamNames();
 
 	/**
 	 * Возвращает набор имен выходных параметров, ожидаемых запросом. Поскольку
@@ -103,7 +102,7 @@ public interface IStatement extends AutoCloseable {
 	 * 
 	 * @return Имена параметров запроса.
 	 */
-	public Set<String> getOutParameters();
+	public String[] getOutParamNames();
 
 	/**
 	 * Sets a parameter.

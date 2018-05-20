@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -224,102 +222,22 @@ public class JdbcStatement extends AbstractStatement {
 	}
 
 	/**
-	 * <p>
-	 * Удаление комментариев (вида /&#42; &#42;/ ) из текста.
-	 * </p>
+	 * Returns the indexes for a name of parameter.
 	 * 
-	 * <p>
-	 * Однако, ввиду того, что в методе используются регулярные выражения, в
-	 * случае, если в тексте присутствуют сложные вложенные комментарии, он
-	 * может отработать с ошибками. Поэтому настоятельно рекомендуется во всех
-	 * файлах, к которым будет применена данная функция видоизменять символы
-	 * вложенных комментариев (например экранировать их).
-	 * </p>
+	 * @param name
+	 *            parameter's name
 	 * 
-	 * @param query
-	 *            Текст, из которого надо удалить комментарии.
+	 * @return parameter's indexes
 	 * 
-	 * @return Текст, после удаления комментариев.
+	 * @throws IllegalArgumentException
+	 *             if the parameter does not exist
 	 */
-	public static final String dropComment(String query) {
-		String dropComments = "/\\*[\\s\\S]*?\\*/";
-		Pattern p = Pattern.compile(dropComments, Pattern.DOTALL
-				| Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
-		Matcher m = p.matcher(query); // get a matcher object
-		StringBuffer sb = new StringBuffer();
-		while (m.find()) {
-			m.appendReplacement(sb, "");
+	protected int[] getIndexes(String name) {
+		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
+		if (indexes == null) {
+			throw new IllegalArgumentException("Parameter not found: " + name);
 		}
-		m.appendTail(sb);
-		return sb.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.AbstractStatement#close()
-	 */
-	@Override
-	public void close() {
-		super.close();
-
-		try {
-			statement.close();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#query()
-	 */
-	@Override
-	public IResultTable query() {
-		try {
-			// if (transaction == null) {
-			return new JdbcResultTable(this, statement.executeQuery());
-			// } else {
-			// // Если запрос выполняется в рамках транзакции, то
-			// // автоматически регистрируем resultset.
-			// return transaction.register(statement.executeQuery());
-			// }
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#execute()
-	 */
-	@Override
-	public boolean execute() {
-		try {
-			return statement.execute();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#executeUpdate()
-	 */
-	@Override
-	public int executeUpdate() {
-		try {
-			return statement.executeUpdate();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
+		return indexes;
 	}
 
 	/**
@@ -342,8 +260,8 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#getParameters()
 	 */
 	@Override
-	public Set<String> getParameters() {
-		return indexMap.keySet();
+	public String[] getParamNames() {
+		return indexMap.keySet().toArray(new String[0]);
 	}
 
 	/*
@@ -352,12 +270,12 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#getOutParameters()
 	 */
 	@Override
-	public Set<String> getOutParameters() {
+	public String[] getOutParamNames() {
 		if (statement instanceof CallableStatement) {
-			return inOutParams.keySet();
+			return inOutParams.keySet().toArray(new String[0]);
 
 		} else {
-			return new TreeSet<String>();
+			return new String[0];
 		}
 	}
 
@@ -365,8 +283,8 @@ public class JdbcStatement extends AbstractStatement {
 	 * Регистрация исходящего параметра. Поскольку исходящие параметры
 	 * определяются по тексту запроса, данный оператор фактически лишь связывает
 	 * с именем выходного параметра тип данных, который через него возвращается.
-	 * Рекомендуется использовать данный метод в связки с
-	 * {@link #getOutParameters()}.
+	 * Рекомендуется использовать данный метод в связке с
+	 * {@link #getOutParamNames()}.
 	 * 
 	 * @param name
 	 *            Название параметра.
@@ -390,55 +308,6 @@ public class JdbcStatement extends AbstractStatement {
 					"Выходные параметры определяются только при вызове "
 							+ "процедур или begin-end блоков.");
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#addBatch()
-	 */
-	@Override
-	public void addBatch() {
-		try {
-			statement.addBatch();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#executeBatch()
-	 */
-	@Override
-	public int[] executeBatch() {
-		try {
-			return statement.executeBatch();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getCleanQuery());
-		}
-	}
-
-	/**
-	 * Returns the indexes for a name of parameter.
-	 * 
-	 * @param name
-	 *            parameter's name
-	 * 
-	 * @return parameter's indexes
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the parameter does not exist
-	 */
-	protected int[] getIndexes(String name) {
-		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
-		if (indexes == null) {
-			throw new IllegalArgumentException("Parameter not found: " + name);
-		}
-		return indexes;
 	}
 
 	/*
@@ -530,6 +399,137 @@ public class JdbcStatement extends AbstractStatement {
 		} catch (SQLException e) {
 		}
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.AbstractStatement#close()
+	 */
+	@Override
+	public void close() {
+		super.close();
+
+		try {
+			statement.close();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#query()
+	 */
+	@Override
+	public IResultTable query() {
+		try {
+			// if (transaction == null) {
+			return new JdbcResultTable(this, statement.executeQuery());
+			// } else {
+			// // Если запрос выполняется в рамках транзакции, то
+			// // автоматически регистрируем resultset.
+			// return transaction.register(statement.executeQuery());
+			// }
+
+		} catch (SQLException e) {
+			throw new TransactionException(e, getCleanQuery());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#execute()
+	 */
+	@Override
+	public boolean execute() {
+		try {
+			return statement.execute();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e, getCleanQuery());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#executeUpdate()
+	 */
+	@Override
+	public int executeUpdate() {
+		try {
+			return statement.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e, getCleanQuery());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#addBatch()
+	 */
+	@Override
+	public void addBatch() {
+		try {
+			statement.addBatch();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e, getCleanQuery());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#executeBatch()
+	 */
+	@Override
+	public int[] executeBatch() {
+		try {
+			return statement.executeBatch();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e, getCleanQuery());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Метод удаляет комментарии вида <tt>/&#42;&#42;/</tt> из текста запроса.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Внимание!</b> Ввиду того, что в методе используются регулярные
+	 * выражения, в случае, если в тексте присутствуют сложные вложенные
+	 * комментарии, он может отработать с ошибками. Поэтому настоятельно
+	 * рекомендуется во всех файлах, к которым будет применена данная функция
+	 * видоизменять символы вложенных комментариев (например экранировать их).
+	 * То же касается символов комментариев внутри строковых констант. Их надо
+	 * разбивать на подстроки или прятать в функции.
+	 * </p>
+	 * 
+	 * @param query
+	 *            Текст, из которого надо удалить комментарии.
+	 * 
+	 * @return Текст запроса, после удаления комментариев.
+	 */
+	public static final String dropComment(String query) {
+		String dropComments = "/\\*[\\s\\S]*?\\*/";
+		Pattern p = Pattern.compile(dropComments, Pattern.DOTALL
+				| Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
+		Matcher m = p.matcher(query); // get a matcher object
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			m.appendReplacement(sb, "");
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 }
