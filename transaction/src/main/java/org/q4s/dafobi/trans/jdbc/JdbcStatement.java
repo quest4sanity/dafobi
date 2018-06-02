@@ -1,3 +1,22 @@
+/*
+ * (C) Copyright 2018 - Vladimir Bogdanov | Data Form Builder
+ *
+ * https://github.com/quest4sanity/dafobi
+ *
+ * Licensed under the LGPL, Version 3 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     /LICENSE.txt or https://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Vladimir Bogdanov - quest4sanity@gmail.com
+ */
 package org.q4s.dafobi.trans.jdbc;
 
 import java.math.BigDecimal;
@@ -10,11 +29,11 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,14 +93,13 @@ public class JdbcStatement extends AbstractStatement {
 		try {
 			this.transaction = transaction;
 
-			indexMap = new HashMap<String, int[]>();
-			inOutParams = new HashMap<String, Integer>();
+			indexMap = new TreeMap<String, int[]>();
+			inOutParams = new TreeMap<String, Integer>();
 
 			// Разберем запрос и выделим входящие и выходные параметры.
 			// Учтем, что в начале вызова процедур может быть любое количетсво
 			// переносов строки и пробелов, а JDBC этого не разрешает.
-			parsedQuery = parse(query.replaceAll("^\\s+", ""), indexMap,
-					inOutParams);
+			parsedQuery = parse(query.replaceAll("^\\s+", ""), indexMap, inOutParams);
 
 			// Выполним необязательную постобработку запроса. По-умолчанию она
 			// включает в себя только удаление комментариев.
@@ -142,8 +160,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @return the parsed query
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static final String parse(final String query, final Map paramMap,
-			final Map<String, Integer> inOutParams) {
+	private static final String parse(final String query, final Map paramMap, final Map<String, Integer> inOutParams) {
 
 		// I was originally using regular expressions, but they didn't work well
 		// for ignoring
@@ -188,8 +205,7 @@ public class JdbcStatement extends AbstractStatement {
 					// Начало строки
 					inDoubleQuote = true;
 
-				} else if (c == '/' && i + 1 < length
-						&& query.charAt(i + 1) == '*') {
+				} else if (c == '/' && i + 1 < length && query.charAt(i + 1) == '*') {
 					// Начало комментария
 					inComment = true;
 					parsedQuery.append(c);
@@ -198,8 +214,7 @@ public class JdbcStatement extends AbstractStatement {
 				} else if ((c == ':' || c == '&') && i + 1 < length
 						&& Character.isJavaIdentifierStart(query.charAt(i + 1))) {
 					int j = i + 2;
-					while (j < length
-							&& Character.isJavaIdentifierPart(query.charAt(j))) {
+					while (j < length && Character.isJavaIdentifierPart(query.charAt(j))) {
 						j++;
 					}
 					String name = query.substring(i + 1, j).toUpperCase();
@@ -215,9 +230,7 @@ public class JdbcStatement extends AbstractStatement {
 					// Если это выходной параметр, то добавим его в список.
 					if (c == '&') {
 						if (inOutParams.containsKey(name)) {
-							throw new RuntimeException(
-									"Нельзя дважды определять как выходную "
-											+ "одну и ту же переменную");
+							throw new RuntimeException("Нельзя определять переменную выходной дважды");
 						}
 						inOutParams.put(name.toUpperCase(), new Integer(index));
 					}
@@ -273,8 +286,8 @@ public class JdbcStatement extends AbstractStatement {
 	}
 
 	/**
-	 * Мето возвращает запрос, из которого были удалены комментарии, а так же
-	 * над которым могла быть произведена специфичная для драйвера обработка.
+	 * Метод возвращает запрос, из которого были удалены комментарии, и над
+	 * которым могла быть произведена специфичная для драйвера обработка.
 	 * 
 	 * @return the processedQuery
 	 */
@@ -307,37 +320,6 @@ public class JdbcStatement extends AbstractStatement {
 		}
 	}
 
-	/**
-	 * Регистрация исходящего параметра. Поскольку исходящие параметры
-	 * определяются по тексту запроса, данный оператор фактически лишь связывает
-	 * с именем выходного параметра тип данных, который через него возвращается.
-	 * Рекомендуется использовать данный метод в связке с
-	 * {@link #getOutParamNames()}.
-	 * 
-	 * @param name
-	 *            Название параметра.
-	 * 
-	 * @param sqlType
-	 *            Тип данных параметра (как он определен в {@link Types}).
-	 */
-	public void registerOutParameter(String name, DataType type) {
-		if (statement instanceof CallableStatement) {
-			try {
-				int index = inOutParams.get(name.toUpperCase());
-				((CallableStatement) statement).registerOutParameter(index,
-						type.jdbcType());
-
-			} catch (SQLException e) {
-				throw new IllegalArgumentException(e);
-			}
-
-		} else {
-			throw new IllegalArgumentException(
-					"Выходные параметры определяются только при вызове "
-							+ "процедур или begin-end блоков.");
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -352,53 +334,46 @@ public class JdbcStatement extends AbstractStatement {
 			int[] indexes = getIndexes(name.toUpperCase());
 			for (int i = 0; i < indexes.length; i++) {
 				Object value = param.getValue();
+				
 				switch (param.getType().jdbcType()) {
 				case Types.CLOB:
-					statement.setClob(indexes[i], value == null ? null
-							: (Clob) value);
+					statement.setClob(indexes[i], value == null ? null : (Clob) value);
 					break;
 
 				case Types.VARCHAR:
-					statement.setString(indexes[i], value == null ? null
-							: (String) value);
+					statement.setString(indexes[i], value == null ? null : (String) value);
 					break;
 
 				case Types.INTEGER:
-					statement.setInt(indexes[i], value == null ? null
-							: (Integer) value);
+					statement.setInt(indexes[i], value == null ? null : (Integer) value);
 					break;
 
 				case Types.BIGINT:
-					statement.setLong(indexes[i], value == null ? null
-							: (Long) value);
+					statement.setLong(indexes[i], value == null ? null : (Long) value);
 					break;
 
 				case Types.NUMERIC:
-					statement.setBigDecimal(indexes[i], value == null ? null
-							: (BigDecimal) value);
+					statement.setBigDecimal(indexes[i], value == null ? null : (BigDecimal) value);
 					break;
 
 				case Types.DATE:
-					statement.setDate(indexes[i], value == null ? null
-							: (Date) value);
+					statement.setDate(indexes[i], value == null ? null : (Date) value);
 					break;
 
 				case Types.TIME:
-					statement.setTime(indexes[i], value == null ? null
-							: (Time) value);
+					statement.setTime(indexes[i], value == null ? null : (Time) value);
 					break;
 
 				case Types.TIMESTAMP:
+					statement.setTimestamp(indexes[i], value == null ? null : (Timestamp) value);
 					// С полем Timestamp в Оракле происходит хрень.
 					// Купируем баг путем перевода в другой тип.
-					statement.setObject(indexes[i], value == null ? null
-							: new Date(((Timestamp) value).getTime()));
+					//statement.setObject(indexes[i], value == null ? null : new Date(((Timestamp) value).getTime()));
 					break;
 
 				default:
-					throw new UnsupportedOperationException(new StringBuilder(
-							"Тип данных").append(param.getClass().getName())
-							.append(" не поддерживается.").toString());
+					throw new UnsupportedOperationException(new StringBuilder("Тип данных")
+							.append(param.getClass().getName()).append(" не поддерживается.").toString());
 				}
 			}
 
@@ -418,13 +393,53 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	@Override
 	public Object getParam(String name, DataType type) {
-		try {
-			Integer index = inOutParams.get(name.toUpperCase());
-			if (index != null) {
-				return ((CallableStatement) statement).getObject(index);
-			}
+		Integer index = inOutParams.get(name.toUpperCase());
+		if (index != null) {
+			CallableStatement callStmt = (CallableStatement) statement;
+			Object value;
+			try {
+				switch (type.jdbcType()) {
+				case Types.CLOB:
+					value = callStmt.getClob(index);
+					break;
 
-		} catch (SQLException e) {
+				case Types.VARCHAR:
+					value = callStmt.getString(index);
+					break;
+
+				case Types.INTEGER:
+					value = callStmt.getInt(index);
+					break;
+
+				case Types.BIGINT:
+					value = callStmt.getLong(index);
+					break;
+
+				case Types.NUMERIC:
+					value = callStmt.getBigDecimal(index);
+					break;
+
+				case Types.DATE:
+					value = callStmt.getDate(index);
+					break;
+
+				case Types.TIME:
+					value = callStmt.getTime(index);
+					break;
+
+				case Types.TIMESTAMP:
+					value = callStmt.getTimestamp(index);
+					break;
+
+				default:
+					throw new UnsupportedOperationException(new StringBuilder("Тип данных")
+							.append(type.getClass().getName()).append(" не поддерживается.").toString());
+				}
+				return value;
+
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return null;
 	}
@@ -549,8 +564,7 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	public static final String dropComment(String query) {
 		String dropComments = "/\\*[\\s\\S]*?\\*/";
-		Pattern p = Pattern.compile(dropComments, Pattern.DOTALL
-				| Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
+		Pattern p = Pattern.compile(dropComments, Pattern.DOTALL | Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
 		Matcher m = p.matcher(query); // get a matcher object
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
