@@ -3,7 +3,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.q4s.dabobi</groupId>
 	<artifactId>transaction</artifactId>
+
 	<name>transaction</name>
+	<description>Средство, обеспечивающее работу с транзакциями.</description>
+
+    <licenses>
+        <license>
+            <name>LGPL-3</name>
+            <url>https://www.gnu.org/licenses/lgpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 	<parent>
 		<groupId>org.q4s</groupId>

@@ -3,7 +3,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.q4s.dafobi</groupId>
 	<artifactId>common</artifactId>
+
 	<name>common</name>
+	<description>.</description>
+
+    <licenses>
+        <license>
+            <name>LGPL-3</name>
+            <url>https://www.gnu.org/licenses/lgpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 	<parent>
 		<groupId>org.q4s</groupId>

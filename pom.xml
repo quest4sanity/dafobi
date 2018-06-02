@@ -3,8 +3,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.q4s</groupId>
 	<artifactId>dafobi</artifactId>
-	<name>dafobi</name>
 	<version>0.0.1-SNAPSHOT</version>
+
+	<name>dafobi</name>
+	<description>Инструмент графического построения форм работы с данными.</description>
+
+    <licenses>
+        <license>
+            <name>LGPL-3</name>
+            <url>https://www.gnu.org/licenses/lgpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 	<packaging>pom</packaging>
 	<modules>
