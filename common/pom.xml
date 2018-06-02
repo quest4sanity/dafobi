@@ -18,7 +18,7 @@
 	<parent>
 		<groupId>org.q4s</groupId>
 		<artifactId>dafobi</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</parent>
 
 	<dependencies>
