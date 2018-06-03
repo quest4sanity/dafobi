@@ -35,16 +35,40 @@ public class DataParam {
 	private final DataType type;
 	private final Object value;
 
+	/**
+	 * Создание типированного значения парметра.
+	 * 
+	 * @param type
+	 *            Тип параметра.
+	 * 
+	 * @param value
+	 *            Значение параметра.
+	 */
 	public DataParam(DataType type, Object value) {
 		this.type = type;
 		this.value = value;
 	}
 
+	/**
+	 * @return Тип параметра.
+	 */
 	public DataType getType() {
 		return type;
 	}
 
+	/**
+	 * @return Значение параметра.
+	 */
 	public Object getValue() {
 		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return new StringBuilder("DataParam: ").append(type).append("[").append(value).append("]").toString();
 	}
 }

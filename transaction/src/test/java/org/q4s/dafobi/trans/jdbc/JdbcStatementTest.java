@@ -24,6 +24,9 @@ import org.q4s.dafobi.trans.IRow;
 import org.q4s.dafobi.trans.IStatement;
 
 /**
+ * Тестировани методов взаимодействия с базой данных класса
+ * {@link JdbcStatement}.
+ * 
  * @author Q4S
  * 
  */
@@ -41,15 +44,17 @@ public class JdbcStatementTest {
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:"
-				+ UUID.randomUUID().toString(), "sa", "");
+		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
-		try (InputStream createTable = HsqldbTest.class
-				.getResourceAsStream("JdbcStatementTest_create.sql");
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_create.sql");
+				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+			stmt.execute();
+		}
 
-				PreparedStatement stmt = connection.prepareStatement(IOUtils
-						.toString(createTable));) {
+		// Creating the procedure
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc.sql");
+				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -77,9 +82,8 @@ public class JdbcStatementTest {
 	@Before
 	public void setUp() throws Exception {
 		// Adding rows into the table
-		insertStatement = connection
-				.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
-						+ "VALUES(?, ?, ?)");
+		insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(?, ?, ?)");
 
 		insertStatement.setInt(1, new Integer(1));
 		insertStatement.setString(2, "Str1");
@@ -102,8 +106,7 @@ public class JdbcStatementTest {
 	@After
 	public void tearDown() throws Exception {
 		// Cleaning the table
-		try (PreparedStatement stmt = connection
-				.prepareStatement("DELETE FROM TEST");) {
+		try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM TEST");) {
 			stmt.executeUpdate();
 		}
 
@@ -147,8 +150,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQuery1() {
-		try (IStatement statement = transaction
-				.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 			statement.setParam("id", DataType.LONG.param(2l));
 			try (IResultTable result = statement.query();) {
 				int i = 0;
@@ -190,11 +192,19 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#execute()}
-	 * .
+	 * <p>
+	 * Проверяется вызов процедуры и возвращение ею параметров.
 	 */
 	@Test
 	public void testExecute() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
+
+			statement.setParam("inp", DataType.INTEGER.param(13));
+			statement.execute();
+			Integer outp = (Integer) statement.getParam("outp", DataType.INTEGER);
+
+			assertEquals(1311, outp.intValue());
+		}
 	}
 
 	/**
@@ -203,42 +213,6 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteUpdate() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParsedQuery()}.
-	 */
-	@Test
-	public void testGetParsedQuery() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getProcessedQuery()}.
-	 */
-	@Test
-	public void testGetCleanQuery() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParamNames()}.
-	 */
-	@Test
-	public void testGetParameters() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getOutParamNames()}.
-	 */
-	@Test
-	public void testGetOutParameters() {
 		fail("Not yet implemented"); // TODO
 	}
 

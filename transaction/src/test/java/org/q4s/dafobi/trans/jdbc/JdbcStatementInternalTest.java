@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
@@ -16,11 +15,13 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.q4s.dafobi.trans.DataType;
-import org.q4s.dafobi.trans.IResultTable;
-import org.q4s.dafobi.trans.IRow;
-import org.q4s.dafobi.trans.IStatement;
 
+/**
+ * Тестировани внутренних методов класса {@link JdbcStatement}.
+ * 
+ * @author root
+ *
+ */
 public class JdbcStatementInternalTest {
 
 	private static Connection connection = null;
@@ -107,5 +108,42 @@ public class JdbcStatementInternalTest {
 	}
 	
 	// TODO Надо протестировать вызовы процедур.
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParsedQuery()}.
+	 */
+	@Test
+	public void testGetParsedQuery() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getProcessedQuery()}.
+	 */
+	@Test
+	public void testGetCleanQuery() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParamNames()}.
+	 */
+	@Test
+	public void testGetParameters() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getOutParamNames()}.
+	 */
+	@Test
+	public void testGetOutParameters() {
+		fail("Not yet implemented"); // TODO
+	}
+
 
 }
