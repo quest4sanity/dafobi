@@ -99,8 +99,7 @@ public enum DataType {
 	DATE(java.sql.Types.DATE, Date.class) {
 		@Override
 		public Date convert(Object sourceValue) {
-			// TODO вообще-то надо делать проверку на наличие времени.
-			return new Date(convertValueToTimestamp(sourceValue).getTime());
+			return convertValueToDate(sourceValue);
 		}
 	},
 
@@ -111,8 +110,7 @@ public enum DataType {
 	TIME(java.sql.Types.TIME, Time.class) {
 		@Override
 		public Time convert(Object sourceValue) {
-			// TODO вообще-то надо делать проверку на наличие даты.
-			return new Time(convertValueToTimestamp(sourceValue).getTime());
+			return convertValueToTime(sourceValue);
 		}
 	},
 
@@ -453,15 +451,15 @@ public enum DataType {
 		if (sourceValue == null) {
 			return null;
 		}
-		
+
 		DataType type;
 		Object value = sourceValue;
 		if (destClass.isAssignableFrom(DataParam.class)) {
 			DataParam param = (DataParam) sourceValue;
 			type = param.getType();
 			value = param.getValue();
-		} 
-		
+		}
+
 		if (destClass.isAssignableFrom(sourceValue.getClass())) {
 			return sourceValue;
 
@@ -493,15 +491,15 @@ public enum DataType {
 	private static String convertValueToString(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
-		} 
+		}
 
 		Object value = sourceValue;
-		if(sourceValue instanceof DataParam) {
+		if (sourceValue instanceof DataParam) {
 			value = ((DataParam) sourceValue).getValue();
 		}
-		
-		if (value instanceof String || value instanceof BigDecimal || value instanceof Integer
-				|| value instanceof Long || value instanceof Number) {
+
+		if (value instanceof String || value instanceof BigDecimal || value instanceof Integer || value instanceof Long
+				|| value instanceof Number) {
 			return value.toString();
 
 		} else if (value instanceof Date || value instanceof Time) {
@@ -520,10 +518,10 @@ public enum DataType {
 	private static Long convertValueToLong(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
-		} 
+		}
 
 		Object value = sourceValue;
-		if(sourceValue instanceof DataParam) {
+		if (sourceValue instanceof DataParam) {
 			value = ((DataParam) sourceValue).getValue();
 		}
 
@@ -581,10 +579,10 @@ public enum DataType {
 		if (sourceValue == null) {
 			return null;
 
-		} 
-		
+		}
+
 		Object value = sourceValue;
-		if(sourceValue instanceof DataParam) {
+		if (sourceValue instanceof DataParam) {
 			value = ((DataParam) sourceValue).getValue();
 		}
 
@@ -622,30 +620,94 @@ public enum DataType {
 	private static Timestamp convertValueToTimestamp(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
-		} 
-		
+		}
+
 		Object value = sourceValue;
-		if(sourceValue instanceof DataParam) {
+		if (sourceValue instanceof DataParam) {
 			value = ((DataParam) sourceValue).getValue();
 		}
 
 		if (value instanceof Timestamp) {
 			return (Timestamp) value;
 
-		} else if (value instanceof String) {
-			String strValue = ((String) value).replaceAll("\\.[0-9]+$", "");
-			Timestamp ts = Timestamp.valueOf(strValue);
-			return ts;
-
 		} else if (value instanceof Date) {
-			Date dateValue = (Date) value;
-			Timestamp ts = new Timestamp(dateValue.getTime());
-			return ts;
+			return new Timestamp(((Date) value).getTime());
+
+		} else if (value instanceof Time) {
+			return new Timestamp(((Time) value).getTime());
 
 		} else if (value instanceof java.util.Date) {
-			java.util.Date dateValue = (java.util.Date) value;
-			Timestamp ts = new Timestamp(dateValue.getTime());
-			return ts;
+			return new Timestamp(((java.util.Date) value).getTime());
+
+		} else if (value instanceof String) {
+			String strValue = ((String) value).replaceAll("\\.[0-9]+$", "");
+			return Timestamp.valueOf(strValue);
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	/**
+	 * Конвертирование значения в дату.
+	 */
+	private static Date convertValueToDate(Object sourceValue) {
+		if (sourceValue == null) {
+			return null;
+		}
+
+		Object value = sourceValue;
+		if (sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
+
+		if (value instanceof Timestamp) {
+			return new Date(((Timestamp) value).getTime());
+
+		} else if (value instanceof Date) {
+			return (Date) value;
+
+		} else if (value instanceof Time) {
+			return new Date(((Time) value).getTime());
+
+		} else if (value instanceof java.util.Date) {
+			return new Date(((java.util.Date) value).getTime());
+
+		} else if (value instanceof String) {
+			Date dt = Date.valueOf((String) value);
+			return dt;
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	/**
+	 * Конвертирование значения во время.
+	 */
+	private static Time convertValueToTime(Object sourceValue) {
+		if (sourceValue == null) {
+			return null;
+		}
+
+		Object value = sourceValue;
+		if (sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
+
+		if (value instanceof Timestamp) {
+			return new Time(((Timestamp) value).getTime());
+
+		} else if (value instanceof Date) {
+			return new Time(((Date) value).getTime());
+
+		} else if (value instanceof Time) {
+			return (Time) value;
+
+		} else if (value instanceof java.util.Date) {
+			return new Time(((java.util.Date) value).getTime());
+
+		} else if (value instanceof String) {
+			Time tm = Time.valueOf((String) value);
+			return tm;
 		}
 
 		throw new IllegalArgumentException();
@@ -659,10 +721,10 @@ public enum DataType {
 	private static Boolean convertValueToBoolean(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
-		} 
-		
+		}
+
 		Object value = sourceValue;
-		if(sourceValue instanceof DataParam) {
+		if (sourceValue instanceof DataParam) {
 			value = ((DataParam) sourceValue).getValue();
 		}
 
