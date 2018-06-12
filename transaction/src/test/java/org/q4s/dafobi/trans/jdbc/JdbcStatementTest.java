@@ -3,20 +3,18 @@
  */
 package org.q4s.dafobi.trans.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Time;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.dbunit.database.DatabaseSequenceFilter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,8 +27,8 @@ import org.q4s.dafobi.trans.IRow;
 import org.q4s.dafobi.trans.IStatement;
 
 /**
- * Тестировани методов взаимодействия с базой данных класса
- * {@link JdbcStatement}.
+ * Тестирование методов класса {@link JdbcStatement}, работающих непосредственно
+ * с базой данных.
  * 
  * @author Q4S
  * 

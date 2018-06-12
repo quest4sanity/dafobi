@@ -108,7 +108,7 @@ public interface IStatement extends AutoCloseable {
 	 * Возвращает набор имен параметров, которые ожидает запрос. В этот набор
 	 * входят как входные, так и выходные параметры.
 	 * 
-	 * @return Имена параметров запроса.
+	 * @return Имена параметров запроса. Все имена содержатся в нижнем регистре.
 	 */
 	public String[] getParamNames();
 
@@ -118,8 +118,9 @@ public interface IStatement extends AutoCloseable {
 	 * то в случае запросов получения табличных данных (вроде SQL запросов)
 	 * метод не возвращает ничего (все параметры трактуются как входные).
 	 * 
-	 * @return Имена параметров запроса. Если запрос не поддерживает выходных
-	 *         параметров, то возвращается пустой массив.
+	 * @return Имена параметров запроса. Все имена содержатся в нижнем регистре.
+	 *         Если запрос не поддерживает выходных параметров, то возвращается
+	 *         пустой массив.
 	 */
 	public String[] getOutParamNames();
 
@@ -145,10 +146,10 @@ public interface IStatement extends AutoCloseable {
 	 * 
 	 * @param name
 	 *            parameter name
-	 *            
+	 * 
 	 * @param type
 	 *            expected parameter type
-	 *            
+	 * 
 	 * @return parameter value
 	 */
 	public Object getParam(String name, DataType type);

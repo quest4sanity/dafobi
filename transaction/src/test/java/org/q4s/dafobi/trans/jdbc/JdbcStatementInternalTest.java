@@ -1,6 +1,7 @@
 package org.q4s.dafobi.trans.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -17,9 +18,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Тестировани внутренних методов класса {@link JdbcStatement}.
+ * Тестировани внутренних методов класса {@link JdbcStatement}:
+ * <p>
+ * {@link JdbcStatement#getParsedQuery()},
+ * {@link JdbcStatement#getProcessedQuery()},
+ * {@link JdbcStatement#getParamNames()},
+ * {@link JdbcStatement#getOutParamNames()}
  * 
- * @author root
+ * @author Q4S
  *
  */
 public class JdbcStatementInternalTest {
@@ -32,15 +38,12 @@ public class JdbcStatementInternalTest {
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:"
-				+ UUID.randomUUID().toString(), "sa", "");
+		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
-		try (InputStream createTable = HsqldbTest.class
-				.getResourceAsStream("JdbcStatementTest_create.sql");
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_create.sql");
 
-				PreparedStatement stmt = connection.prepareStatement(IOUtils
-						.toString(createTable));) {
+				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -66,18 +69,15 @@ public class JdbcStatementInternalTest {
 
 	/**
 	 * Вначале тестируется самый простой SELECT запрос (однострочный и только с
-	 * одним параметром)
+	 * одним параметром).
 	 */
 	@Test
 	public void testSimpleSelectQuery() {
-		try (JdbcStatement statement = (JdbcStatement) transaction
-				.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+		try (JdbcStatement statement = (JdbcStatement) transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 
-			assertEquals("SELECT * FROM TEST WHERE ID = ?",
-					statement.getParsedQuery());
-			assertEquals("SELECT * FROM TEST WHERE ID = ?",
-					statement.getProcessedQuery());
-			assertArrayEquals(new String[] { "ID" }, statement.getParamNames());
+			assertEquals("SELECT * FROM TEST WHERE ID = ?", statement.getParsedQuery());
+			assertEquals("SELECT * FROM TEST WHERE ID = ?", statement.getProcessedQuery());
+			assertArrayEquals(new String[] { "id" }, statement.getParamNames());
 			assertArrayEquals(new String[] {}, statement.getOutParamNames());
 		}
 	}
@@ -88,62 +88,19 @@ public class JdbcStatementInternalTest {
 	 */
 	@Test
 	public void testMediumSelectQuery() {
-		try (JdbcStatement statement = (JdbcStatement) transaction
-				.prepare("/* Шапка запроса*/\r\n"//
-						+ "SELECT * FROM TEST\r\n"
-						+ "WHERE ID = :id1 OR ID = :id2 OR ID = :id3");) {
+		try (JdbcStatement statement = (JdbcStatement) transaction.prepare("/* Шапка запроса*/\r\n"//
+				+ "SELECT * FROM TEST\r\n" //
+				+ "WHERE ID = :id1 OR ID = :id2 OR ID = :id3");) {
 
 			assertEquals("/* Шапка запроса*/\r\n"//
-					+ "SELECT * FROM TEST\r\n"
-					+ "WHERE ID = ? OR ID = ? OR ID = ?",
-					statement.getParsedQuery());
-			assertEquals("SELECT * FROM TEST WHERE ID = ? OR ID = ? OR ID = ?",
-					statement.getProcessedQuery());
+					+ "SELECT * FROM TEST\r\n" //
+					+ "WHERE ID = ? OR ID = ? OR ID = ?", statement.getParsedQuery());
+			assertEquals("SELECT * FROM TEST WHERE ID = ? OR ID = ? OR ID = ?", statement.getProcessedQuery());
 
 			String[] params = statement.getParamNames();
 			Arrays.sort(params);
-			assertArrayEquals(new String[] { "ID1", "ID2", "ID3" }, params);
+			assertArrayEquals(new String[] { "id1", "id2", "id3" }, params);
 			assertArrayEquals(new String[] {}, statement.getOutParamNames());
 		}
 	}
-	
-	// TODO Надо протестировать вызовы процедур.
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParsedQuery()}.
-	 */
-	@Test
-	public void testGetParsedQuery() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getProcessedQuery()}.
-	 */
-	@Test
-	public void testGetCleanQuery() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getParamNames()}.
-	 */
-	@Test
-	public void testGetParameters() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#getOutParamNames()}.
-	 */
-	@Test
-	public void testGetOutParameters() {
-		fail("Not yet implemented"); // TODO
-	}
-
-
 }
