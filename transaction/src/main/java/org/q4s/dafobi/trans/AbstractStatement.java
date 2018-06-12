@@ -5,9 +5,8 @@
  *
  * Licensed under the LGPL, Version 3 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     /LICENSE.txt or https://www.gnu.org/licenses/lgpl.txt
+ * You may obtain a copy of the License in LGPL.txt file in 
+ * the root directory or at https://www.gnu.org/licenses/lgpl.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
