@@ -217,7 +217,7 @@ public class JdbcStatement extends AbstractStatement {
 					while (j < length && Character.isJavaIdentifierPart(query.charAt(j))) {
 						j++;
 					}
-					String name = query.substring(i + 1, j).toUpperCase();
+					String name = query.substring(i + 1, j).toLowerCase();
 					i += name.length(); // skip past the end if the parameter
 
 					List indexList = (List) paramMap.get(name);
@@ -232,7 +232,7 @@ public class JdbcStatement extends AbstractStatement {
 						if (inOutParams.containsKey(name)) {
 							throw new RuntimeException("Нельзя определять переменную выходной дважды");
 						}
-						inOutParams.put(name.toUpperCase(), new Integer(index));
+						inOutParams.put(name.toLowerCase(), new Integer(index));
 					}
 
 					c = '?'; // replace the parameter with a question mark
@@ -271,7 +271,7 @@ public class JdbcStatement extends AbstractStatement {
 	 *             if the parameter does not exist
 	 */
 	protected final int[] getIndexes(String name) {
-		int[] indexes = (int[]) indexMap.get(name.toUpperCase());
+		int[] indexes = (int[]) indexMap.get(name.toLowerCase());
 		if (indexes == null) {
 			throw new IllegalArgumentException("Parameter not found: " + name);
 		}
@@ -331,7 +331,7 @@ public class JdbcStatement extends AbstractStatement {
 		super.setParam(name, param);
 
 		try {
-			int[] indexes = getIndexes(name.toUpperCase());
+			int[] indexes = getIndexes(name.toLowerCase());
 			for (int i = 0; i < indexes.length; i++) {
 				Object value = param.getValue();
 				
@@ -393,7 +393,7 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	@Override
 	public Object getParam(String name, DataType type) {
-		Integer index = inOutParams.get(name.toUpperCase());
+		Integer index = inOutParams.get(name.toLowerCase());
 		if (index != null) {
 			CallableStatement callStmt = (CallableStatement) statement;
 			Object value;

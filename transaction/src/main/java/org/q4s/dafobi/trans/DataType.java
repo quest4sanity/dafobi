@@ -99,9 +99,9 @@ public enum DataType {
 	 */
 	DATE(java.sql.Types.DATE, Date.class) {
 		@Override
-		public Object convert(Object sourceValue) {
+		public Date convert(Object sourceValue) {
 			// TODO вообще-то надо делать проверку на наличие времени.
-			return convertValueToTimestamp(sourceValue);
+			return new Date(convertValueToTimestamp(sourceValue).getTime());
 		}
 	},
 
@@ -192,11 +192,13 @@ public enum DataType {
 	 * @return Пара тип-значение для использования в операторах транзакции.
 	 */
 	public DataParam param(Object value) {
-		if (this.typeClass.isAssignableFrom(value.getClass())) {
+		if (value == null) {
+			return new DataParam(this, null);
+
+		} else if (this.typeClass.isAssignableFrom(value.getClass())) {
 			return new DataParam(this, value);
 		}
-		throw new IllegalArgumentException(new StringBuilder(
-				"Неверный тип данных").toString());
+		throw new IllegalArgumentException(new StringBuilder("Неверный тип данных").toString());
 	}
 
 	/**
@@ -220,8 +222,7 @@ public enum DataType {
 			}
 		}
 
-		throw new RuntimeException(new StringBuilder("Class ")
-				.append(clazz.getName())
+		throw new RuntimeException(new StringBuilder("Class ").append(clazz.getName())
 				.append(" is not supported as DataType yet").toString());
 	}
 
@@ -246,9 +247,8 @@ public enum DataType {
 			}
 		}
 
-		throw new RuntimeException(new StringBuilder("JDBC type ")
-				.append(jdbcType).append(" is not supported as DataType yet")
-				.toString());
+		throw new RuntimeException(new StringBuilder("JDBC type ").append(jdbcType)
+				.append(" is not supported as DataType yet").toString());
 	}
 
 	/**
@@ -389,8 +389,7 @@ public enum DataType {
 	 * 
 	 * @deprecated Этот метод заменен теперь методом {@link #convert(Object)}.
 	 */
-	private static Object parseValue(final DataType parType,
-			final String parValue) {
+	private static Object parseValue(final DataType parType, final String parValue) {
 		Object value;
 		if (parValue == null) {
 			value = null;
@@ -427,8 +426,7 @@ public enum DataType {
 				break;
 
 			default:
-				throw new RuntimeException("ValueHoldersStorage with type "
-						+ parType + " are not supported");
+				throw new RuntimeException("ValueHoldersStorage with type " + parType + " are not supported");
 			}
 		}
 		return value;
@@ -455,8 +453,17 @@ public enum DataType {
 	private static Object convertValue(Object sourceValue, Class<?> destClass) {
 		if (sourceValue == null) {
 			return null;
-
-		} else if (destClass.isAssignableFrom(sourceValue.getClass())) {
+		}
+		
+		DataType type;
+		Object value = sourceValue;
+		if (destClass.isAssignableFrom(DataParam.class)) {
+			DataParam param = (DataParam) sourceValue;
+			type = param.getType();
+			value = param.getValue();
+		} 
+		
+		if (destClass.isAssignableFrom(sourceValue.getClass())) {
 			return sourceValue;
 
 		} else if (String.class.isAssignableFrom(destClass)) {
@@ -487,18 +494,22 @@ public enum DataType {
 	private static String convertValueToString(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
+		} 
 
-		} else if (sourceValue instanceof String
-				|| sourceValue instanceof BigDecimal
-				|| sourceValue instanceof Integer
-				|| sourceValue instanceof Long || sourceValue instanceof Number) {
-			return sourceValue.toString();
+		Object value = sourceValue;
+		if(sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
+		
+		if (value instanceof String || value instanceof BigDecimal || value instanceof Integer
+				|| value instanceof Long || value instanceof Number) {
+			return value.toString();
 
-		} else if (sourceValue instanceof Date || sourceValue instanceof Time) {
+		} else if (value instanceof Date || value instanceof Time) {
 			throw new UnsupportedOperationException();
 
-		} else if (sourceValue instanceof Timestamp) {
-			return sourceValue.toString().replaceAll("\\.[0-9]+$", "");
+		} else if (value instanceof Timestamp) {
+			return value.toString().replaceAll("\\.[0-9]+$", "");
 		}
 
 		throw new IllegalArgumentException();
@@ -510,26 +521,32 @@ public enum DataType {
 	private static Long convertValueToLong(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
+		} 
 
-		} else if (sourceValue instanceof String) {
-			return new Long((String) sourceValue);
+		Object value = sourceValue;
+		if(sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
 
-		} else if (sourceValue instanceof BigDecimal) {
-			BigDecimal val = (BigDecimal) sourceValue;
+		if (value instanceof String) {
+			return new Long((String) value);
+
+		} else if (value instanceof BigDecimal) {
+			BigDecimal val = (BigDecimal) value;
 			if (val.scale() == 0) {
 				return val.longValue();
 			} else {
 				throw new IllegalArgumentException();
 			}
 
-		} else if (sourceValue instanceof Long) {
-			return (Long) sourceValue;
+		} else if (value instanceof Long) {
+			return (Long) value;
 
-		} else if (sourceValue instanceof Integer) {
-			return ((Integer) sourceValue).longValue();
+		} else if (value instanceof Integer) {
+			return ((Integer) value).longValue();
 
-		} else if (sourceValue instanceof Double) {
-			Double val = (Double) sourceValue;
+		} else if (value instanceof Double) {
+			Double val = (Double) value;
 			Double floorVal = Math.floor(val);
 			if ((val - floorVal) == 0) {
 				return floorVal.longValue();
@@ -537,8 +554,8 @@ public enum DataType {
 				throw new IllegalArgumentException();
 			}
 
-		} else if (sourceValue instanceof Float) {
-			Float val = (Float) sourceValue;
+		} else if (value instanceof Float) {
+			Float val = (Float) value;
 			Double floorVal = Math.floor(val);
 			if ((val - floorVal) == 0) {
 				return floorVal.longValue();
@@ -546,11 +563,11 @@ public enum DataType {
 				throw new IllegalArgumentException();
 			}
 
-		} else if (sourceValue instanceof Short) {
-			return ((Short) sourceValue).longValue();
+		} else if (value instanceof Short) {
+			return ((Short) value).longValue();
 
-		} else if (sourceValue instanceof Number) {
-			Number val = (Number) sourceValue;
+		} else if (value instanceof Number) {
+			Number val = (Number) value;
 			Double floorVal = Math.floor(val.doubleValue());
 			return floorVal.longValue();
 		}
@@ -565,29 +582,36 @@ public enum DataType {
 		if (sourceValue == null) {
 			return null;
 
-		} else if (sourceValue instanceof String) {
-			return new BigDecimal((String) sourceValue);
+		} 
+		
+		Object value = sourceValue;
+		if(sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
 
-		} else if (sourceValue instanceof BigDecimal) {
-			return (BigDecimal) sourceValue;
+		if (value instanceof String) {
+			return new BigDecimal((String) value);
 
-		} else if (sourceValue instanceof Long) {
-			return new BigDecimal((Long) sourceValue);
+		} else if (value instanceof BigDecimal) {
+			return (BigDecimal) value;
 
-		} else if (sourceValue instanceof Integer) {
-			return new BigDecimal((Long) sourceValue);
+		} else if (value instanceof Long) {
+			return new BigDecimal((Long) value);
 
-		} else if (sourceValue instanceof Double) {
-			return new BigDecimal((Double) sourceValue);
+		} else if (value instanceof Integer) {
+			return new BigDecimal((Long) value);
 
-		} else if (sourceValue instanceof Float) {
-			return new BigDecimal((Float) sourceValue);
+		} else if (value instanceof Double) {
+			return new BigDecimal((Double) value);
 
-		} else if (sourceValue instanceof Short) {
-			return new BigDecimal((Short) sourceValue);
+		} else if (value instanceof Float) {
+			return new BigDecimal((Float) value);
 
-		} else if (sourceValue instanceof Number) {
-			return new BigDecimal(((Number) sourceValue).toString());
+		} else if (value instanceof Short) {
+			return new BigDecimal((Short) value);
+
+		} else if (value instanceof Number) {
+			return new BigDecimal(((Number) value).toString());
 		}
 
 		throw new IllegalArgumentException();
@@ -599,22 +623,28 @@ public enum DataType {
 	private static Timestamp convertValueToTimestamp(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
+		} 
+		
+		Object value = sourceValue;
+		if(sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
 
-		} else if (sourceValue instanceof Timestamp) {
-			return (Timestamp) sourceValue;
+		if (value instanceof Timestamp) {
+			return (Timestamp) value;
 
-		} else if (sourceValue instanceof String) {
-			String value = ((String) sourceValue).replaceAll("\\.[0-9]+$", "");
-			Timestamp ts = Timestamp.valueOf(value);
+		} else if (value instanceof String) {
+			String strValue = ((String) value).replaceAll("\\.[0-9]+$", "");
+			Timestamp ts = Timestamp.valueOf(strValue);
 			return ts;
 
-		} else if (sourceValue instanceof Date) {
-			Date dateValue = (Date) sourceValue;
+		} else if (value instanceof Date) {
+			Date dateValue = (Date) value;
 			Timestamp ts = new Timestamp(dateValue.getTime());
 			return ts;
 
-		} else if (sourceValue instanceof java.util.Date) {
-			java.util.Date dateValue = (java.util.Date) sourceValue;
+		} else if (value instanceof java.util.Date) {
+			java.util.Date dateValue = (java.util.Date) value;
 			Timestamp ts = new Timestamp(dateValue.getTime());
 			return ts;
 		}
@@ -630,17 +660,24 @@ public enum DataType {
 	private static Boolean convertValueToBoolean(Object sourceValue) {
 		if (sourceValue == null) {
 			return null;
-		} else if (sourceValue instanceof Boolean) {
-			return (Boolean) sourceValue;
+		} 
+		
+		Object value = sourceValue;
+		if(sourceValue instanceof DataParam) {
+			value = ((DataParam) sourceValue).getValue();
+		}
 
-		} else if (sourceValue instanceof BigDecimal) {
-			return !new BigDecimal(0).equals(sourceValue);
+		if (value instanceof Boolean) {
+			return (Boolean) value;
 
-		} else if (sourceValue instanceof Long) {
-			return !new Long(0).equals(((Long) sourceValue));
+		} else if (value instanceof BigDecimal) {
+			return !new BigDecimal(0).equals(value);
 
-		} else if (sourceValue instanceof String) {
-			switch (((String) sourceValue).toUpperCase()) {
+		} else if (value instanceof Long) {
+			return !new Long(0).equals(((Long) value));
+
+		} else if (value instanceof String) {
+			switch (((String) value).toUpperCase()) {
 			case "Д":
 			case "Y":
 			case "T":

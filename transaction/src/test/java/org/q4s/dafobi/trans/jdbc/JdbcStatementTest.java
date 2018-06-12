@@ -10,14 +10,19 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.Time;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.dbunit.database.DatabaseSequenceFilter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.q4s.dafobi.trans.DataParam;
 import org.q4s.dafobi.trans.DataType;
 import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IRow;
@@ -200,6 +205,7 @@ public class JdbcStatementTest {
 		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
 
 			statement.setParam("inp", DataType.INTEGER.param(13));
+			statement.setParam("outp", DataType.INTEGER.param(0));
 			statement.execute();
 			Integer outp = (Integer) statement.getParam("outp", DataType.INTEGER);
 
@@ -213,7 +219,16 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteUpdate() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)")) {
+
+			statement.setParam("id", DataType.INTEGER.param(10));
+			statement.setParam("str", DataType.STRING.param("Str 10"));
+			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
+			statement.executeUpdate();
+
+			assertEquals(new Long(3), getRowCount());
+		}
 	}
 
 	/**
@@ -222,7 +237,24 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteBatch() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)");) {
+
+			statement.setParam("id", DataType.INTEGER.param(10));
+			statement.setParam("str", DataType.STRING.param("Str 10"));
+			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
+			statement.addBatch();
+
+			statement.setParam("id", DataType.INTEGER.param(20));
+			statement.setParam("str", DataType.STRING.param("Str 20"));
+			statement.setParam("dt", DataType.DATE.param(new Date(4000)));
+			statement.addBatch();
+
+			statement.executeBatch();
+
+			assertEquals(new Long(4), getRowCount());
+
+		}
 	}
 
 	/**
@@ -231,7 +263,21 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQueryMapOfStringObject() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+			Map<String, DataParam> params = new TreeMap<String, DataParam>();
+			params.put("id", DataType.INTEGER.param(2));
+
+			try (IResultTable result = statement.query(params);) {
+				int i = 0;
+				for (IRow row : result) {
+					assertEquals(new Long(2), row.getInteger(0));
+					assertEquals("Str2", row.getString(1));
+					assertEquals(new Date(1000), row.getTimestamp(2));
+					i++;
+				}
+				assertEquals(1, i);
+			}
+		}
 	}
 
 	/**
@@ -240,7 +286,16 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteMapOfStringObject() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
+			Map<String, DataParam> params = new TreeMap<String, DataParam>();
+			params.put("inp", DataType.INTEGER.param(13));
+			params.put("outp", DataType.INTEGER.param(0));
+
+			statement.execute(params);
+			Integer outp = (Integer) DataType.INTEGER.convert(params.get("outp"));
+
+			assertEquals(1311, outp.intValue());
+		}
 	}
 
 	/**
@@ -250,7 +305,17 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteUpdateMapOfStringObject() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)")) {
+			Map<String, DataParam> params = new TreeMap<String, DataParam>();
+			params.put("id", DataType.INTEGER.param(10));
+			params.put("str", DataType.STRING.param("Str 10"));
+			params.put("dt", DataType.DATE.param(new Date(2000)));
+
+			statement.executeUpdate(params);
+
+			assertEquals(new Long(3), getRowCount());
+		}
 	}
 
 	/**
@@ -259,7 +324,23 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testAddBatchMapOfStringObject() {
-		fail("Not yet implemented"); // TODO
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)");) {
+			Map<String, DataParam> params = new TreeMap<String, DataParam>();
+			params.put("id", DataType.INTEGER.param(10));
+			params.put("str", DataType.STRING.param("Str 10"));
+			params.put("dt", DataType.DATE.param(new Date(2000)));
+			statement.addBatch(params);
+
+			params.put("id", DataType.INTEGER.param(20));
+			params.put("str", DataType.STRING.param("Str 20"));
+			params.put("dt", DataType.DATE.param(new Date(4000)));
+			statement.addBatch(params);
+
+			statement.executeBatch();
+
+			assertEquals(new Long(4), getRowCount());
+		}
 	}
 
 }

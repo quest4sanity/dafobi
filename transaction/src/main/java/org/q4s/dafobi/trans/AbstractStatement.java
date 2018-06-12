@@ -55,10 +55,24 @@ public abstract class AbstractStatement implements IStatement {
 	 */
 	@Override
 	public boolean execute(Map<String, DataParam> parameters) {
-		for (Entry<String, DataParam> param : parameters.entrySet()) {
-			setParam(param.getKey(), param.getValue());
+		for (String name : getParamNames()) {
+			DataParam param = parameters.get(name);
+			if (param == null) {
+				throw new IllegalArgumentException(
+						new StringBuilder("Отсутствует описание параметра с именем: ").append(name).toString());
+			}
+			setParam(name, param);
 		}
-		return execute();
+
+		boolean rc = execute();
+
+		for (String name : getOutParamNames()) {
+			DataParam param = parameters.get(name);
+			DataType type = param.getType();
+			Object value = getParam(name, type);
+			parameters.put(name, type.param(value));
+		}
+		return rc;
 	}
 
 	/*
@@ -99,7 +113,7 @@ public abstract class AbstractStatement implements IStatement {
 	 */
 	@Override
 	public void setParam(String name, DataParam value) {
-		params.put(name, value);
+		params.put(name.toLowerCase(), value);
 	}
 
 	/*
@@ -110,7 +124,7 @@ public abstract class AbstractStatement implements IStatement {
 	 */
 	@Override
 	public Object getParam(String name, DataType type) {
-		return type.convert(params.get(name));
+		return type.convert(params.get(name.toLowerCase()));
 	}
 
 	/*
