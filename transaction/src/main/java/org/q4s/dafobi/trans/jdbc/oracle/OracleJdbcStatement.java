@@ -46,7 +46,7 @@ public class OracleJdbcStatement extends JdbcStatement {
 	 * @see org.q4s.dafobi.trans.jdbc.JdbcStatement#isQueryCallable()
 	 */
 	@Override
-	protected boolean isQueryCallable() {
+	protected boolean isCallable() {
 		// Запрос автоматически определяется как Callable, если он имеет
 		// формат "{call ...}" или "[declare ... ]begin ... end".
 		// TODO Конструкция BEGIN-END существует только в Oracle

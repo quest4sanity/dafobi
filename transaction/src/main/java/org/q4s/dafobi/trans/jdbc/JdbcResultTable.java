@@ -61,6 +61,36 @@ public class JdbcResultTable extends AbstractResultTable {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see java.lang.AutoCloseable#close()
+	 */
+	@Override
+	public void close() {
+		try {
+			resultSet.close();
+			
+		} catch (SQLException e) {
+			new RuntimeException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IResultTable#isClosed()
+	 */
+	@Override
+	public boolean isClosed() {
+		try {
+			return resultSet.isClosed();
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override
@@ -139,36 +169,6 @@ public class JdbcResultTable extends AbstractResultTable {
 		public void remove() {
 			throw new RuntimeException(
 					"Method remove() can't be used in this kind of iterator");
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.AutoCloseable#close()
-	 */
-	@Override
-	public void close() {
-		try {
-			resultSet.close();
-			
-		} catch (SQLException e) {
-			new RuntimeException(e);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IResultTable#isClosed()
-	 */
-	@Override
-	public boolean isClosed() {
-		try {
-			return resultSet.isClosed();
-
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

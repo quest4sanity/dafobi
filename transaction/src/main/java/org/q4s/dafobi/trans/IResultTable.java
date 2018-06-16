@@ -20,6 +20,11 @@ package org.q4s.dafobi.trans;
 
 public interface IResultTable extends Iterable<IRow>, AutoCloseable {
 
+	/**
+	 * @return Оператор, породивший данные. 
+	 */
+	IStatement getStatement();
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -28,6 +33,9 @@ public interface IResultTable extends Iterable<IRow>, AutoCloseable {
 	@Override
 	public void close();
 
+	/**
+	 * @return true - if result table is closed
+	 */
 	public boolean isClosed();
 
 	/**

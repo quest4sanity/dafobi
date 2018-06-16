@@ -41,28 +41,34 @@ public interface ITransaction extends AutoCloseable {
 	 */
 	public IStatement prepare(final String statement);
 
-	public int executeUpdate(final String statement,
-			final Map<String, DataParam> parameters);
-
 	/**
-	 * @deprecated Похоже, не удастся реализовать очистку ресурсов.
+	 * Выполнение команды без возврата данных. Это может быть оператор DDL или
+	 * вызов процедуры. В последнем случае возможно использование выходных
+	 * параметров.
 	 * 
 	 * @param statement
+	 *            Текст оператора.
+	 * 
 	 * @param parameters
-	 * @return
+	 *            Карта с типированными параметрами.
+	 * 
+	 * @return Количество строк, которые были обновлены.
 	 */
-	public boolean execute(final String statement,
-			final Map<String, DataParam> parameters);
+	public int execute(final String statement, final Map<String, DataParam> parameters);
 
 	/**
-	 * @deprecated Похоже, не удастся реализовать очистку ресурсов.
+	 * Выполнение команды с возвратом данных. Это может быть оператор SELECT или
+	 * вызов процедуры.
 	 * 
 	 * @param statement
+	 *            Текст оператора.
+	 * 
 	 * @param parameters
-	 * @return
+	 *            Карта с типированными параметрами.
+	 * 
+	 * @return Табличный набор данных.
 	 */
-	public Iterable<IRow> query(final String statement,
-			final Map<String, DataParam> parameters);
+	public IResultTable query(final String statement, final Map<String, DataParam> parameters);
 
 	public void setAutocommit(boolean flag);
 

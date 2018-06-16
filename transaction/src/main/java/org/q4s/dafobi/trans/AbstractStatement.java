@@ -30,17 +30,13 @@ import java.util.TreeMap;
  */
 public abstract class AbstractStatement implements IStatement {
 
-	@Override
-	public void close() {
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.q4s.dafobi.trans.IStatement#query(java.util.Map)
 	 */
 	@Override
-	public IResultTable query(Map<String, DataParam> parameters) {
+	public final IResultTable query(Map<String, DataParam> parameters) {
 		for (Entry<String, DataParam> param : parameters.entrySet()) {
 			setParam(param.getKey(), param.getValue());
 		}
@@ -53,7 +49,7 @@ public abstract class AbstractStatement implements IStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#execute(java.util.Map)
 	 */
 	@Override
-	public boolean execute(Map<String, DataParam> parameters) {
+	public final int execute(Map<String, DataParam> parameters) {
 		for (String name : getParamNames()) {
 			DataParam param = parameters.get(name);
 			if (param == null) {
@@ -63,29 +59,17 @@ public abstract class AbstractStatement implements IStatement {
 			setParam(name, param);
 		}
 
-		boolean rc = execute();
+		int count = execute();
 
+		// Если для обычного оператора указаны выходные параметры,
+		// то тут может возникнуть ошибка.
 		for (String name : getOutParamNames()) {
 			DataParam param = parameters.get(name);
 			DataType type = param.getType();
 			Object value = getParam(name, type);
 			parameters.put(name, type.param(value));
 		}
-		return rc;
-	}
-
-	/*
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#executeUpdate(java.util.Map)
-	 */
-	@Override
-	public int executeUpdate(Map<String, DataParam> parameters) {
-		for (Entry<String, DataParam> param : parameters.entrySet()) {
-			setParam(param.getKey(), param.getValue());
-		}
-		return executeUpdate();
+		return count;
 	}
 
 	/*
@@ -95,7 +79,7 @@ public abstract class AbstractStatement implements IStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#addBatch(java.util.Map)
 	 */
 	@Override
-	public void addBatch(Map<String, DataParam> parameters) {
+	public final void addBatch(Map<String, DataParam> parameters) {
 		for (Entry<String, DataParam> param : parameters.entrySet()) {
 			setParam(param.getKey(), param.getValue());
 		}

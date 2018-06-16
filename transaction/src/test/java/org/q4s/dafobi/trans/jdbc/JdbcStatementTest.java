@@ -1,5 +1,20 @@
-/**
- * 
+/*
+ * (C) Copyright 2018 - Vladimir Bogdanov | Data Form Builder
+ *
+ * https://github.com/quest4sanity/dafobi
+ *
+ * Licensed under the LGPL, Version 3 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License in LGPL.txt file in 
+ * the root directory or at https://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
 package org.q4s.dafobi.trans.jdbc;
 
@@ -37,7 +52,7 @@ public class JdbcStatementTest {
 
 	private static Connection connection = null;
 
-	JdbcTransaction transaction;
+	private JdbcTransaction transaction;
 
 	/**
 	 * 
@@ -60,6 +75,12 @@ public class JdbcStatementTest {
 				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
+
+		// Creating second the procedure
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc2.sql");
+				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+			stmt.execute();
+		}
 	}
 
 	/**
@@ -68,14 +89,23 @@ public class JdbcStatementTest {
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		String dropTable = "DROP TABLE TEST";
+		// Dropping procedures
+		String dropProc = "DROP PROCEDURE test_out_param";
+		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+			stmt.execute();
+		}
+		
+		dropProc = "DROP PROCEDURE test_cursor";
+		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+			stmt.execute();
+		}
+		
 		// Dropping the table
+		String dropTable = "DROP TABLE TEST";
 		try (PreparedStatement stmt = connection.prepareStatement(dropTable);) {
 			stmt.execute();
 		}
 	}
-
-	PreparedStatement insertStatement;
 
 	/**
 	 * Метод добавляет начальные строки в тестовую таблицу.
@@ -85,19 +115,21 @@ public class JdbcStatementTest {
 	@Before
 	public void setUp() throws Exception {
 		// Adding rows into the table
-		insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
-				+ "VALUES(?, ?, ?)");
+		try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(?, ?, ?)")) {
 
-		insertStatement.setInt(1, new Integer(1));
-		insertStatement.setString(2, "Str1");
-		insertStatement.setDate(3, new Date(0));
-		insertStatement.executeUpdate();
+			insertStatement.setInt(1, new Integer(1));
+			insertStatement.setString(2, "Str1");
+			insertStatement.setDate(3, new Date(0));
+			insertStatement.addBatch();
 
-		insertStatement.setInt(1, new Integer(2));
-		insertStatement.setString(2, "Str2");
-		insertStatement.setDate(3, new Date(1000));
-		insertStatement.executeUpdate();
-
+			insertStatement.setInt(1, new Integer(2));
+			insertStatement.setString(2, "Str2");
+			insertStatement.setDate(3, new Date(1000));
+			insertStatement.addBatch();
+			
+			insertStatement.executeBatch();
+		}
 		transaction = new JdbcTransaction(connection);
 	}
 
@@ -113,7 +145,6 @@ public class JdbcStatementTest {
 			stmt.executeUpdate();
 		}
 
-		insertStatement.close();
 		transaction.close();
 	}
 
@@ -150,12 +181,15 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}.
+	 * <p>
+	 * Пример получения одной строки (по ид.). 
 	 */
 	@Test
-	public void testQuery1() {
+	public void testQueryById() {
 		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 			statement.setParam("id", DataType.LONG.param(2l));
 			try (IResultTable result = statement.query();) {
+
 				int i = 0;
 				for (IRow row : result) {
 					assertEquals(new Long(2), row.getInteger(0));
@@ -170,9 +204,34 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}.
+	 * <p>
+	 * Пример получения одной строики (по ид.) с помощью процедуры. 
 	 */
 	@Test
-	public void testQuery2() {
+	public void testQueryByIdProc() {
+		try (IStatement statement = transaction.prepare("{call test_cursor(:id)}");) {
+			statement.setParam("id", DataType.LONG.param(2l));
+			try (IResultTable result = statement.query();) {
+
+				int i = 0;
+				for (IRow row : result) {
+					assertEquals(new Long(2), row.getInteger(0));
+					assertEquals("Str2", row.getString(1));
+					assertEquals(new Date(1000), row.getTimestamp(2));
+					i++;
+				}
+				assertEquals(1, i);
+			}
+		}
+	}
+
+	/**
+	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}.
+	 * <p>
+	 * Пример получения нескольких строк. 
+	 */
+	@Test
+	public void testQueryManyRows() {
 		try (IStatement statement = transaction.prepare("SELECT * FROM TEST");
 				IResultTable result = statement.query();) {
 
@@ -194,68 +253,6 @@ public class JdbcStatementTest {
 	}
 
 	/**
-	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#execute()}
-	 * <p>
-	 * Проверяется вызов процедуры и возвращение ею параметров.
-	 */
-	@Test
-	public void testExecute() {
-		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
-
-			statement.setParam("inp", DataType.INTEGER.param(13));
-			statement.setParam("outp", DataType.INTEGER.param(0));
-			statement.execute();
-			Integer outp = (Integer) statement.getParam("outp", DataType.INTEGER);
-
-			assertEquals(1311, outp.intValue());
-		}
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeUpdate()}.
-	 */
-	@Test
-	public void testExecuteUpdate() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
-				+ "VALUES(:id, :str, :dt)")) {
-
-			statement.setParam("id", DataType.INTEGER.param(10));
-			statement.setParam("str", DataType.STRING.param("Str 10"));
-			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
-			statement.executeUpdate();
-
-			assertEquals(new Long(3), getRowCount());
-		}
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeBatch()}.
-	 */
-	@Test
-	public void testExecuteBatch() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
-				+ "VALUES(:id, :str, :dt)");) {
-
-			statement.setParam("id", DataType.INTEGER.param(10));
-			statement.setParam("str", DataType.STRING.param("Str 10"));
-			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
-			statement.addBatch();
-
-			statement.setParam("id", DataType.INTEGER.param(20));
-			statement.setParam("str", DataType.STRING.param("Str 20"));
-			statement.setParam("dt", DataType.DATE.param(new Date(4000)));
-			statement.addBatch();
-
-			statement.executeBatch();
-
-			assertEquals(new Long(4), getRowCount());
-
-		}
-	}
-
-	/**
 	 * Test method for
 	 * {@link org.q4s.dafobi.trans.AbstractStatement#query(java.util.Map)}.
 	 */
@@ -264,8 +261,8 @@ public class JdbcStatementTest {
 		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();
 			params.put("id", DataType.INTEGER.param(2));
-
 			try (IResultTable result = statement.query(params);) {
+
 				int i = 0;
 				for (IRow row : result) {
 					assertEquals(new Long(2), row.getInteger(0));
@@ -275,6 +272,23 @@ public class JdbcStatementTest {
 				}
 				assertEquals(1, i);
 			}
+		}
+	}
+
+	/**
+	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#execute()}
+	 * <p>
+	 * Проверяется вызов процедуры и возвращение ею параметров.
+	 */
+	@Test
+	public void testExecute() {
+		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
+			statement.setParam("inp", DataType.INTEGER.param(13));
+			statement.setParam("outp", DataType.INTEGER.param(0));
+			statement.execute();
+
+			Integer outp = (Integer) statement.getParam("outp", DataType.INTEGER);
+			assertEquals(1311, outp.intValue());
 		}
 	}
 
@@ -290,9 +304,26 @@ public class JdbcStatementTest {
 			params.put("outp", DataType.INTEGER.param(0));
 
 			statement.execute(params);
-			Integer outp = (Integer) DataType.INTEGER.convert(params.get("outp"));
 
+			Integer outp = (Integer) DataType.INTEGER.convert(params.get("outp"));
 			assertEquals(1311, outp.intValue());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeUpdate()}.
+	 */
+	@Test
+	public void testExecuteUpdate() {
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)")) {
+			statement.setParam("id", DataType.INTEGER.param(10));
+			statement.setParam("str", DataType.STRING.param("Str 10"));
+			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
+			statement.execute();
+
+			assertEquals(new Long(3), getRowCount());
 		}
 	}
 
@@ -310,9 +341,33 @@ public class JdbcStatementTest {
 			params.put("str", DataType.STRING.param("Str 10"));
 			params.put("dt", DataType.DATE.param(new Date(2000)));
 
-			statement.executeUpdate(params);
+			statement.execute(params);
 
 			assertEquals(new Long(3), getRowCount());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeBatch()}.
+	 */
+	@Test
+	public void testExecuteBatch() {
+		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+				+ "VALUES(:id, :str, :dt)");) {
+			statement.setParam("id", DataType.INTEGER.param(10));
+			statement.setParam("str", DataType.STRING.param("Str 10"));
+			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
+			statement.addBatch();
+
+			statement.setParam("id", DataType.INTEGER.param(20));
+			statement.setParam("str", DataType.STRING.param("Str 20"));
+			statement.setParam("dt", DataType.DATE.param(new Date(4000)));
+			statement.addBatch();
+
+			statement.executeBatch();
+
+			assertEquals(new Long(4), getRowCount());
 		}
 	}
 
@@ -321,7 +376,7 @@ public class JdbcStatementTest {
 	 * {@link org.q4s.dafobi.trans.AbstractStatement#addBatch(java.util.Map)}.
 	 */
 	@Test
-	public void testAddBatchMapOfStringObject() {
+	public void testExecuteBatchMapOfStringObject() {
 		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)");) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();

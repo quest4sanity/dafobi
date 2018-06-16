@@ -45,6 +45,11 @@ public interface IStatement extends AutoCloseable {
 	public void close();
 
 	/**
+	 * @return true - if statement is closed
+	 */
+	public boolean isClosed();
+
+	/**
 	 * Executes the statement, which must be a query.
 	 * 
 	 * @return the query results
@@ -57,20 +62,6 @@ public interface IStatement extends AutoCloseable {
 	public IResultTable query(final Map<String, DataParam> parameters);
 
 	/**
-	 * Executes the statement, which must be an SQL INSERT, UPDATE or DELETE
-	 * statement; or an SQL statement that returns nothing, such as a DDL
-	 * statement.
-	 * 
-	 * @return number of rows affected
-	 * 
-	 * @throws TransactionException
-	 *             if an error occurred
-	 */
-	public int executeUpdate();
-
-	public int executeUpdate(final Map<String, DataParam> parameters);
-
-	/**
 	 * Executes the statement.
 	 * 
 	 * @return true if the first result is a {@link ResultTable}
@@ -78,9 +69,20 @@ public interface IStatement extends AutoCloseable {
 	 * @throws TransactionException
 	 *             if an error occurred
 	 */
-	public boolean execute();
+	public int execute();
 
-	public boolean execute(final Map<String, DataParam> parameters);
+	/**
+	 * Executes the statement.
+	 * 
+	 * @param parameters
+	 *            Карта параметров. Если для оператора определены выходные
+	 *            параметры, то они будут трактованы на входные-выходные
+	 *            (INOUT). Если такая трактовка не верна, то следует
+	 *            воспользоваться методом {@link #execute()}.
+	 * 
+	 * @return
+	 */
+	public int execute(final Map<String, DataParam> parameters);
 
 	/**
 	 * Adds the current set of parameters as a batch entry.
@@ -90,6 +92,17 @@ public interface IStatement extends AutoCloseable {
 	 */
 	public void addBatch();
 
+	/**
+	 * Adds the current set of parameters as a batch entry.
+	 * 
+	 * @param parameters
+	 *            Карта параметров. Если для оператора определены выходные
+	 *            параметры, то они будут трактованы на входные-выходные
+	 *            (INOUT). Если такая трактовка не верна, то следует
+	 *            воспользоваться методом {@link #addBatch()}.
+	 * 
+	 * @return
+	 */
 	public void addBatch(final Map<String, DataParam> parameters);
 
 	/**

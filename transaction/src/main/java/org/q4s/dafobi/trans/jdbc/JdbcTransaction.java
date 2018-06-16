@@ -42,17 +42,6 @@ public class JdbcTransaction extends AbstractTransaction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.AbstractTransaction#close()
-	 */
-	@Override
-	public void close() {
-		// Завершение транзакции не приводит к разрыву подключения.
-		// getConnection().close();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.AbstractTransaction#prepare(java.lang.String)
 	 */
 	@Override

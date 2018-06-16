@@ -102,25 +102,6 @@ public abstract class AbstractResultTable implements IResultTable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see java.lang.AutoCloseable#close()
-	 */
-	@Override
-	public void close() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IResultTable#isClosed()
-	 */
-	@Override
-	public boolean isClosed() {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.IResultTable#getCount()
 	 */
 	@Override
@@ -148,8 +129,7 @@ public abstract class AbstractResultTable implements IResultTable {
 				return i;
 			}
 		}
-		throw new IllegalArgumentException(new StringBuilder(
-				"Неверное имя колонки запроса: ").append(name).toString());
+		throw new IllegalArgumentException(new StringBuilder("Неверное имя колонки запроса: ").append(name).toString());
 	}
 
 	/*

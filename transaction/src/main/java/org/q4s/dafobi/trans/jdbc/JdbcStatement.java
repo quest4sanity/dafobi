@@ -82,6 +82,8 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	private final String processedQuery;
 
+	private final boolean isCallable;
+
 	/**
 	 * @see JdbcStatement
 	 * 
@@ -105,8 +107,15 @@ public class JdbcStatement extends AbstractStatement {
 			processedQuery = processQuery(parsedQuery);
 
 			// Процедурные запрос и обычные отрабатываются по разному.
+			//
+			isCallable = isOperatorCallable(processedQuery);
+			if (!isCallable && getOutParamNames().length > 0) {
+				// TODO Надо поменять на что-то вменяемое.
+				throw new RuntimeException("Возвращаемые параметры можно использовать только в вызываемых операторах.");
+			}
+
 			Connection connection = transaction.getConnection();
-			if (isQueryCallable()) {
+			if (isCallable) {
 				statement = connection.prepareCall(parsedQuery);
 
 			} else {
@@ -136,13 +145,17 @@ public class JdbcStatement extends AbstractStatement {
 	 * код, который определит, является запрос вызовом процедуры (и могут ли по
 	 * нему возвращаться выходные значения) или нет.
 	 * 
+	 * @param operator
+	 *            Текст оператора, на основании которого надо определить,
+	 *            является ли он вызовом процедуры или оператором базы данных.
+	 * 
 	 * @return true - если запрос является вызовом процедуры (или аналогом);
 	 *         false - если это обычный запрос к базе.
 	 */
-	protected boolean isQueryCallable() {
+	protected boolean isOperatorCallable(String operator) {
 		// Запрос автоматически определяется как Callable, если он имеет
 		// формат "{call ...}"
-		return "{call".equalsIgnoreCase(processedQuery.substring(0, 5));
+		return "{call".equalsIgnoreCase(operator.substring(0, 5));
 	}
 
 	/**
@@ -294,6 +307,18 @@ public class JdbcStatement extends AbstractStatement {
 		return processedQuery;
 	}
 
+	/**
+	 * Метод выполняется в цикле конструктора оператора. В него можно внести
+	 * код, который определит, является запрос вызовом процедуры (и могут ли по
+	 * нему возвращаться выходные значения) или нет.
+	 * 
+	 * @return true - если запрос является вызовом процедуры (или аналогом);
+	 *         false - если это обычный запрос к базе.
+	 */
+	public final boolean isCallable() {
+		return isCallable;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -333,7 +358,7 @@ public class JdbcStatement extends AbstractStatement {
 			int[] indexes = getIndexes(name.toLowerCase());
 			for (int i = 0; i < indexes.length; i++) {
 				Object value = param.getValue();
-				
+
 				switch (param.getType().jdbcType()) {
 				case Types.CLOB:
 					statement.setClob(indexes[i], value == null ? null : (Clob) value);
@@ -367,7 +392,8 @@ public class JdbcStatement extends AbstractStatement {
 					statement.setTimestamp(indexes[i], value == null ? null : (Timestamp) value);
 					// С полем Timestamp в Оракле происходит хрень.
 					// Купируем баг путем перевода в другой тип.
-					//statement.setObject(indexes[i], value == null ? null : new Date(((Timestamp) value).getTime()));
+					// statement.setObject(indexes[i], value == null ? null :
+					// new Date(((Timestamp) value).getTime()));
 					break;
 
 				default:
@@ -450,10 +476,23 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	@Override
 	public void close() {
-		super.close();
-
 		try {
 			statement.close();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IStatement#isClosed()
+	 */
+	@Override
+	public boolean isClosed() {
+		try {
+			return statement.isClosed();
 
 		} catch (SQLException e) {
 			throw new TransactionException(e);
@@ -468,13 +507,18 @@ public class JdbcStatement extends AbstractStatement {
 	@Override
 	public IResultTable query() {
 		try {
-			// if (transaction == null) {
-			return new JdbcResultTable(this, statement.executeQuery());
-			// } else {
-			// // Если запрос выполняется в рамках транзакции, то
-			// // автоматически регистрируем resultset.
-			// return transaction.register(statement.executeQuery());
-			// }
+			if (isCallable()) {
+				boolean rc = statement.execute();
+				if (statement.getMoreResults()) {
+					return new JdbcResultTable(this, statement.getResultSet());
+				} else {
+					// TODO Надо поменять на что-то вменяемое.
+					throw new RuntimeException("Оператор не вернул ResultSet");
+				}
+
+			} else {
+				return new JdbcResultTable(this, statement.executeQuery());
+			}
 
 		} catch (SQLException e) {
 			throw new TransactionException(e, getProcessedQuery());
@@ -487,24 +531,14 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public int execute() {
 		try {
-			return statement.execute();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#executeUpdate()
-	 */
-	@Override
-	public int executeUpdate() {
-		try {
-			return statement.executeUpdate();
+			if (isCallable()) {
+				statement.execute();
+				return 0;
+			} else {
+				return statement.executeUpdate();
+			}
 
 		} catch (SQLException e) {
 			throw new TransactionException(e, getProcessedQuery());
@@ -519,7 +553,12 @@ public class JdbcStatement extends AbstractStatement {
 	@Override
 	public void addBatch() {
 		try {
-			statement.addBatch();
+			if (isCallable()) {
+				// TODO Надо поменять на что-то вменяемое.
+				throw new RuntimeException("Вызываемый оператор не может использоваться в пакете");
+			} else {
+				statement.addBatch();
+			}
 
 		} catch (SQLException e) {
 			throw new TransactionException(e, getProcessedQuery());
@@ -534,7 +573,12 @@ public class JdbcStatement extends AbstractStatement {
 	@Override
 	public int[] executeBatch() {
 		try {
-			return statement.executeBatch();
+			if (isCallable()) {
+				// TODO Надо поменять на что-то вменяемое.
+				throw new RuntimeException("Вызываемый оператор не может использоваться в пакете");
+			} else {
+				return statement.executeBatch();
+			}
 
 		} catch (SQLException e) {
 			throw new TransactionException(e, getProcessedQuery());

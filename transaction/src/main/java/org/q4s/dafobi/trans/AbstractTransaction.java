@@ -26,12 +26,28 @@ import java.util.Map;
  */
 public abstract class AbstractTransaction implements ITransaction {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.ITransaction#close()
+	 */
+	@Override
+	public void close() {
+		// Изменения должны фиксировать явно с помощью оператора commit
+		// кроме случаев, когда установлен флаг autocommit.
+		if (getAutocommit()) {
+			commit();
+		} else {
+			rollback();
+		}
+	}
+
 	/**
 	 * Сокращенная версия кода:
 	 * 
 	 * <pre>
 	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	int count = stmt.executeUpdate(params);
+	 * 	int count = stmt.execute(params);
 	 * 	...
 	 * }
 	 * </pre>
@@ -45,12 +61,11 @@ public abstract class AbstractTransaction implements ITransaction {
 	 * @return Количество затронутых запросом строк.
 	 */
 	@Override
-	public final int executeUpdate(final String statement,
-			final Map<String, DataParam> parameters) {
+	public final int execute(final String statement, final Map<String, DataParam> parameters) {
 		int count;
-		
+
 		try (IStatement stmt = prepare(statement);) {
-			count = stmt.executeUpdate(parameters);
+			count = stmt.execute(parameters);
 		}
 		return count;
 	}
@@ -60,35 +75,7 @@ public abstract class AbstractTransaction implements ITransaction {
 	 * 
 	 * <pre>
 	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	boolean rc = stmt.execute(params);
-	 * 	...
-	 * }
-	 * </pre>
-	 * 
-	 * @param statement
-	 *            Текст оператора, который надо будет выполнять.
-	 * 
-	 * @param parameters
-	 *            Значения параметров, с которыми выполняется запрос.
-	 * 
-	 * @return Количество затронутых запросом строк.
-	 */
-	@Override
-	public final boolean execute(final String statement,
-			final Map<String, DataParam> parameters) {
-		boolean rc;
-		try (IStatement stmt = prepare(statement);) {
-			rc = stmt.execute(parameters);
-		}
-		return rc;
-	}
-
-	/**
-	 * Сокращенная версия кода:
-	 * 
-	 * <pre>
-	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	Iterable&lt;IRow&gt; rows = stmt.query(params);
+	 * 	IResultTable rt = stmt.query(params);
 	 * 	...
 	 * }
 	 * </pre>
@@ -100,15 +87,12 @@ public abstract class AbstractTransaction implements ITransaction {
 	 *            Значения параметров, с которыми выполняется запрос.
 	 * 
 	 * @return Итератор по полученным строкам.
-	 * 
-	 * @deprecated Похоже, здесь могут быть проблемы с освобождением ресурсов.
 	 */
 	@Override
-	public Iterable<IRow> query(final String statement,
-			final Map<String, DataParam> parameters) {
-		Iterable<IRow> result = null;
+	public final IResultTable query(final String statement, final Map<String, DataParam> parameters) {
+		IResultTable result = null;
 		try (IStatement stmt = prepare(statement);) {
-			result = stmt.query(parameters);
+			result = new AutoclosableResultTable(stmt.query(parameters));
 		}
 		return result;
 	}

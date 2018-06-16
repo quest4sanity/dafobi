@@ -25,46 +25,60 @@ import java.sql.Timestamp;
 
 import org.q4s.dafobi.exception.WrongIndexException;
 
-/*
+/**
+ * Строка данных, представляет собой набор именовых и нумерованных значений
+ * (начиная от нуля). Используя индекс или имя, можно получить доступ к данным.
+ * Если при этом мы так же знаем, какого типа там содержатся данные, то можем
+ * использовать возвращающий соответствующее значение метод.
  * 
  * @author Q4S
  *
  */
 public interface IRow {
 	/**
-	 * Получение значения по номеру колонки. 
+	 * Получение значения по номеру колонки.
 	 * 
-	 * @param columnNum Номер колонки
+	 * @param columnNum
+	 *            Номер колонки
 	 * 
-	 * @return Значение, связанные с данным номером.
+	 * @return Значение, связанные с данным номером и строкой.
 	 *
 	 */
 	public Object get(int columnNum) throws WrongIndexException;
-	
+
+	/**
+	 * Получение значения по имени колонки.
+	 * 
+	 * @param columnName
+	 *            Символьное имя колонки
+	 * 
+	 * @return Значение, связанные с данным именем и строкой.
+	 *
+	 */
 	public Object get(String columnName) throws WrongIndexException;
-	
+
 	public String getString(int columnNum) throws WrongIndexException;
-	
+
 	public String getString(String columnName) throws WrongIndexException;
-	
+
 	public Long getInteger(int columnNum) throws WrongIndexException;
-	
+
 	public Long getInteger(String columnName) throws WrongIndexException;
-	
+
 	public BigDecimal getDecimal(int columnNum) throws WrongIndexException;
-	
+
 	public BigDecimal getDecimal(String columnName) throws WrongIndexException;
-	
+
 	public Date getDate(int columnNum) throws WrongIndexException;
-	
+
 	public Date getDate(String columnName) throws WrongIndexException;
-	
+
 	public Time getTime(int columnNum) throws WrongIndexException;
-	
+
 	public Time getTime(String columnName) throws WrongIndexException;
-	
+
 	public Timestamp getTimestamp(int columnNum) throws WrongIndexException;
-	
+
 	public Timestamp getTimestamp(String columnName) throws WrongIndexException;
-	
+
 }
