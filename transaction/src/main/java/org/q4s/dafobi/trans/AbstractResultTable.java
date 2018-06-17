@@ -18,6 +18,7 @@
  */
 package org.q4s.dafobi.trans;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +130,7 @@ public abstract class AbstractResultTable implements IResultTable {
 				return i;
 			}
 		}
-		throw new IllegalArgumentException(new StringBuilder("Неверное имя колонки запроса: ").append(name).toString());
+		throw new IllegalArgumentException(MessageFormat.format("Неверное имя колонки запроса: {0}", name));
 	}
 
 	/*

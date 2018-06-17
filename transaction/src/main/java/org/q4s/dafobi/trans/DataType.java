@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 
 /**
  * Типы данных, с которыми умеет работать система, а так же ряда методов для
@@ -94,7 +95,7 @@ public enum DataType {
 
 	/**
 	 * Тип данных "Дата". Он связан с JDBC типом {@link java.sql.Types.DATE}.
-	 * Значения данного типа хранятся в классе {@link java.sql.Types.Date}.
+	 * Значения данного типа хранятся в классе {@link java.sql.Date}.
 	 */
 	DATE(java.sql.Types.DATE, Date.class) {
 		@Override
@@ -105,7 +106,7 @@ public enum DataType {
 
 	/**
 	 * Тип данных "Время". Он связан с JDBC типом {@link java.sql.Types#TIME} .
-	 * Значения данного типа хранятся в классе {@link java.sql.Types.Time}.
+	 * Значения данного типа хранятся в классе {@link java.sql.Time}.
 	 */
 	TIME(java.sql.Types.TIME, Time.class) {
 		@Override
@@ -117,7 +118,7 @@ public enum DataType {
 	/**
 	 * Тип данных "Дата-время". Он связан с JDBC типом
 	 * {@link java.sql.Types#TIMESTAMP}. Значения данного типа хранятся в классе
-	 * {@link java.sql.Types.Timestamp}.
+	 * {@link java.sql.Timestamp}.
 	 */
 	DATETIME(java.sql.Types.TIMESTAMP, Timestamp.class) {
 		@Override
@@ -195,7 +196,8 @@ public enum DataType {
 		} else if (this.typeClass.isAssignableFrom(value.getClass())) {
 			return new DataParam(this, value);
 		}
-		throw new IllegalArgumentException(new StringBuilder("Неверный тип данных").toString());
+		throw new IllegalArgumentException(MessageFormat.format("Класс {0} не может быть преобразован к типу {1}.",
+				value.getClass().getName(), this));
 	}
 
 	/**
@@ -219,8 +221,7 @@ public enum DataType {
 			}
 		}
 
-		throw new RuntimeException(new StringBuilder("Class ").append(clazz.getName())
-				.append(" is not supported as DataType yet").toString());
+		throw new RuntimeException(MessageFormat.format("Class {0} is not supported as DataType yet", clazz.getName()));
 	}
 
 	/**
@@ -244,8 +245,7 @@ public enum DataType {
 			}
 		}
 
-		throw new RuntimeException(new StringBuilder("JDBC type ").append(jdbcType)
-				.append(" is not supported as DataType yet").toString());
+		throw new RuntimeException(MessageFormat.format("JDBC type {0} is not supported as DataType yet", jdbcType));
 	}
 
 	/**
@@ -306,7 +306,7 @@ public enum DataType {
 
 	/**
 	 * <p>
-	 * Функция по классу типа данных возвращает его символьный код.
+	 * Функция по классу типа данных возвращает его тип данных JDBC.
 	 * </p>
 	 * 
 	 * @param typeCode
@@ -320,7 +320,7 @@ public enum DataType {
 
 	/**
 	 * <p>
-	 * Функция по классу типа данных возвращает его символьный код.
+	 * Функция по классу типа данных возвращает его тип данных JDBC.
 	 * </p>
 	 * 
 	 * @param clazz
@@ -446,6 +446,8 @@ public enum DataType {
 	 *            Класс, в который надо сконвертировать значение.
 	 * 
 	 * @return Сконвертированное в нужный класс значение.
+	 * 
+	 * @deprecated Этот метод нигде не используется.
 	 */
 	private static Object convertValue(Object sourceValue, Class<?> destClass) {
 		if (sourceValue == null) {

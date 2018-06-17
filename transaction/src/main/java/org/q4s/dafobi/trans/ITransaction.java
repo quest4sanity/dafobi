@@ -20,7 +20,111 @@ package org.q4s.dafobi.trans;
 
 import java.util.Map;
 
+import org.q4s.dafobi.exception.TransactionException;
+
 public interface ITransaction extends AutoCloseable {
+
+	/**
+	 * Предварительная подготовка запроса. Как правило в нее входит
+	 * предобработка и компиляция (в случае необходимости).
+	 * 
+	 * @param statement
+	 *            Текст оператора, который предстоит выполнить.
+	 * 
+	 * @return Подготовленный к дальнейшей работе оператор.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public IStatement prepare(final String statement);
+
+	/**
+	 * Сокращенная версия кода:
+	 * 
+	 * <pre>
+	 * try (IStatement stmt = transaction.prepare(sql);) {
+	 * 	int count = stmt.execute(params);
+	 * 	...
+	 * }
+	 * </pre>
+	 * 
+	 * @see IStatement#execute(Map)
+	 * 
+	 * @param statement
+	 *            Текст оператора, который надо будет выполнить.
+	 * 
+	 * @param parameters
+	 *            Значения параметров, с которыми выполняется запрос.
+	 * 
+	 * @return Количество затронутых запросом строк.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public int execute(final String statement, final Map<String, DataParam> parameters);
+
+	/**
+	 * Сокращенная версия кода:
+	 * 
+	 * <pre>
+	 * try (IStatement stmt = transaction.prepare(sql);) {
+	 * 	IResultTable rt = stmt.query(params);
+	 * 	...
+	 * }
+	 * </pre>
+	 * 
+	 * @see IStatement#query(Map)
+	 * 
+	 * @param statement
+	 *            Текст оператора, который надо будет выполнить.
+	 * 
+	 * @param parameters
+	 *            Значения параметров, с которыми выполняется запрос.
+	 * 
+	 * @return Табличный набор данных.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public IResultTable query(final String statement, final Map<String, DataParam> parameters);
+
+	/**
+	 * @param flag
+	 *            true - приводит к тому, что commit будет делаться после
+	 *            каждого оператора; false - приводит к тому, что commit надо
+	 *            будет вызывать вручную с помощью метода {@link #commit()}.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public void setAutocommit(boolean flag);
+
+	/**
+	 * @return true - если commit делается после каждого оператора; false - если
+	 *         commit надо вызывать вручную с помощью метода {@link #commit()}.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public boolean getAutocommit();
+
+	/**
+	 * Подтверждение сделанных в рамках транзакции изменений. После этого они
+	 * становятся постоянными.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public void commit();
+
+	/**
+	 * Отмена всех сделанных в рамках транзакции изменений. Данные возвращаются
+	 * к состоянию, в котором они были до начала всех изменений.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public void rollback();
 
 	/*
 	 * (non-Javadoc)
@@ -29,54 +133,6 @@ public interface ITransaction extends AutoCloseable {
 	 */
 	@Override
 	public void close();
-
-	/**
-	 * Предварительная подготовка запроса. Как правило в нее входит
-	 * предобработка и компиляция его (в случае необходимости).
-	 * 
-	 * @param statement
-	 *            Текст оператора, который предстоит выполнить.
-	 * 
-	 * @return Подготовленный к дальнейшей работе оператор.
-	 */
-	public IStatement prepare(final String statement);
-
-	/**
-	 * Выполнение команды без возврата данных. Это может быть оператор DDL или
-	 * вызов процедуры. В последнем случае возможно использование выходных
-	 * параметров.
-	 * 
-	 * @param statement
-	 *            Текст оператора.
-	 * 
-	 * @param parameters
-	 *            Карта с типированными параметрами.
-	 * 
-	 * @return Количество строк, которые были обновлены.
-	 */
-	public int execute(final String statement, final Map<String, DataParam> parameters);
-
-	/**
-	 * Выполнение команды с возвратом данных. Это может быть оператор SELECT или
-	 * вызов процедуры.
-	 * 
-	 * @param statement
-	 *            Текст оператора.
-	 * 
-	 * @param parameters
-	 *            Карта с типированными параметрами.
-	 * 
-	 * @return Табличный набор данных.
-	 */
-	public IResultTable query(final String statement, final Map<String, DataParam> parameters);
-
-	public void setAutocommit(boolean flag);
-
-	public boolean getAutocommit();
-
-	public void commit();
-
-	public void rollback();
 
 	public void getLastError();
 }

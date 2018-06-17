@@ -18,9 +18,9 @@
  */
 package org.q4s.dafobi.trans;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 /**
  * Класс, реализующий базовый скелет для запросов.
@@ -54,7 +54,7 @@ public abstract class AbstractStatement implements IStatement {
 			DataParam param = parameters.get(name);
 			if (param == null) {
 				throw new IllegalArgumentException(
-						new StringBuilder("Отсутствует описание параметра с именем: ").append(name).toString());
+						MessageFormat.format("Отсутствует описание параметра с именем: {0}", name));
 			}
 			setParam(name, param);
 		}
@@ -86,38 +86,49 @@ public abstract class AbstractStatement implements IStatement {
 		addBatch();
 	}
 
-	private Map<String, DataParam> params = new TreeMap<String, DataParam>();
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.q4s.dafobi.trans.IStatement#setParam(java.lang.String,
-	 * org.q4s.dafobi.trans.DataParam)
+	 * org.q4s.dafobi.trans.DataType, java.lang.Object)
 	 */
 	@Override
-	public void setParam(String name, DataParam value) {
-		params.put(name.toLowerCase(), value);
+	public final void setParam(String name, DataType type, Object value) {
+		setParam(name, type.param(value));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#getParam(java.lang.String,
-	 * org.q4s.dafobi.trans.DataType)
-	 */
-	@Override
-	public Object getParam(String name, DataType type) {
-		return type.convert(params.get(name.toLowerCase()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IStatement#getParamNames()
-	 */
-	@Override
-	public String[] getParamNames() {
-		return params.keySet().toArray(new String[0]);
-	}
+	// private Map<String, DataParam> params = new TreeMap<String, DataParam>();
+	//
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see org.q4s.dafobi.trans.IStatement#setParam(java.lang.String,
+	// * org.q4s.dafobi.trans.DataParam)
+	// */
+	// @Override
+	// public void setParam(String name, DataParam value) {
+	// params.put(name.toLowerCase(), value);
+	// }
+	//
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see org.q4s.dafobi.trans.IStatement#getParam(java.lang.String,
+	// * org.q4s.dafobi.trans.DataType)
+	// */
+	// @Override
+	// public Object getParam(String name, DataType type) {
+	// return type.convert(params.get(name.toLowerCase()));
+	// }
+	//
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see org.q4s.dafobi.trans.IStatement#getParamNames()
+	// */
+	// @Override
+	// public String[] getParamNames() {
+	// return params.keySet().toArray(new String[0]);
+	// }
 
 }

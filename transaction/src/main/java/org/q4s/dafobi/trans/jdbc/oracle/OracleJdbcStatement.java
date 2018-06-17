@@ -43,17 +43,18 @@ public class OracleJdbcStatement extends JdbcStatement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.jdbc.JdbcStatement#isQueryCallable()
+	 * @see
+	 * org.q4s.dafobi.trans.jdbc.JdbcStatement#isOperatorCallable(java.lang.
+	 * String)
 	 */
 	@Override
-	protected boolean isCallable() {
+	protected boolean isOperatorCallable(String operator) {
 		// Запрос автоматически определяется как Callable, если он имеет
 		// формат "{call ...}" или "[declare ... ]begin ... end".
 		// TODO Конструкция BEGIN-END существует только в Oracle
-		String processedQuery = getProcessedQuery();
-		return "{call".equalsIgnoreCase(processedQuery.substring(0, 5))
-				|| "begin".equalsIgnoreCase(processedQuery.substring(0, 5))
-				|| "declare".equalsIgnoreCase(processedQuery.substring(0, 7));
+		return "{call".equalsIgnoreCase(operator.substring(0, 5))
+				|| "begin".equalsIgnoreCase(operator.substring(0, 5))
+				|| "declare".equalsIgnoreCase(operator.substring(0, 7));
 	}
 
 }

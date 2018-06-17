@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -352,18 +353,12 @@ public class JdbcStatement extends AbstractStatement {
 	 */
 	@Override
 	public void setParam(String name, DataParam param) {
-		super.setParam(name, param);
-
 		try {
 			int[] indexes = getIndexes(name.toLowerCase());
 			for (int i = 0; i < indexes.length; i++) {
 				Object value = param.getValue();
 
 				switch (param.getType().jdbcType()) {
-				case Types.CLOB:
-					statement.setClob(indexes[i], value == null ? null : (Clob) value);
-					break;
-
 				case Types.VARCHAR:
 					statement.setString(indexes[i], value == null ? null : (String) value);
 					break;
@@ -396,9 +391,13 @@ public class JdbcStatement extends AbstractStatement {
 					// new Date(((Timestamp) value).getTime()));
 					break;
 
+				case Types.CLOB:
+					statement.setClob(indexes[i], value == null ? null : (Clob) value);
+					break;
+
 				default:
-					throw new UnsupportedOperationException(new StringBuilder("Тип данных")
-							.append(param.getClass().getName()).append(" не поддерживается.").toString());
+					throw new UnsupportedOperationException(
+							MessageFormat.format("Тип данных {0} не поддерживается.", param.getClass().getName()));
 				}
 			}
 
@@ -424,10 +423,6 @@ public class JdbcStatement extends AbstractStatement {
 			Object value;
 			try {
 				switch (type.jdbcType()) {
-				case Types.CLOB:
-					value = callStmt.getClob(index);
-					break;
-
 				case Types.VARCHAR:
 					value = callStmt.getString(index);
 					break;
@@ -456,9 +451,13 @@ public class JdbcStatement extends AbstractStatement {
 					value = callStmt.getTimestamp(index);
 					break;
 
+				case Types.CLOB:
+					value = callStmt.getClob(index);
+					break;
+
 				default:
-					throw new UnsupportedOperationException(new StringBuilder("Тип данных")
-							.append(type.getClass().getName()).append(" не поддерживается.").toString());
+					throw new UnsupportedOperationException(
+							MessageFormat.format("Тип данных {0} не поддерживается.", type.getClass().getName()));
 				}
 				return value;
 
@@ -475,7 +474,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.AbstractStatement#close()
 	 */
 	@Override
-	public void close() {
+	public final void close() {
 		try {
 			statement.close();
 
@@ -490,7 +489,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @see org.q4s.dafobi.trans.IStatement#isClosed()
 	 */
 	@Override
-	public boolean isClosed() {
+	public final boolean isClosed() {
 		try {
 			return statement.isClosed();
 
@@ -536,6 +535,7 @@ public class JdbcStatement extends AbstractStatement {
 			if (isCallable()) {
 				statement.execute();
 				return 0;
+
 			} else {
 				return statement.executeUpdate();
 			}

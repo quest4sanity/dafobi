@@ -80,36 +80,12 @@ public class RowImpl implements IRow {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IRow#get(int)
-	 */
-	@Override
-	public Object get(int columnNum) throws WrongIndexException {
-		if (columnNum < 0 || columnNum >= values.length) {
-			throw new WrongIndexException();
-		}
-		// Ожидается, что все данные будут неизменяемые по своей природе.
-		return values[columnNum];
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.IRow#get(java.lang.String)
 	 */
 	@Override
 	public final Object get(String columnName) throws WrongIndexException {
 		int index = rowInfo.getColumnIndex(columnName);
 		return get(index);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getString(int)
-	 */
-	@Override
-	public String getString(int columnNum) throws WrongIndexException {
-		return (String) get(columnNum);
 	}
 
 	/*
@@ -126,32 +102,12 @@ public class RowImpl implements IRow {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getInteger(int)
-	 */
-	@Override
-	public Long getInteger(int columnNum) throws WrongIndexException {
-		return (Long) get(columnNum);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.IRow#getInteger(java.lang.String)
 	 */
 	@Override
 	public final Long getInteger(String columnName) throws WrongIndexException {
 		int index = rowInfo.getColumnIndex(columnName);
 		return getInteger(index);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getDecimal(int)
-	 */
-	@Override
-	public BigDecimal getDecimal(int columnNum) throws WrongIndexException {
-		return (BigDecimal) get(columnNum);
 	}
 
 	/*
@@ -169,32 +125,12 @@ public class RowImpl implements IRow {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getDate(int)
-	 */
-	@Override
-	public Date getDate(int columnNum) throws WrongIndexException {
-		return (Date) get(columnNum);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.IRow#getDate(java.lang.String)
 	 */
 	@Override
 	public final Date getDate(String columnName) throws WrongIndexException {
 		int index = rowInfo.getColumnIndex(columnName);
 		return getDate(index);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getTime(int)
-	 */
-	@Override
-	public Time getTime(int columnNum) throws WrongIndexException {
-		return (Time) get(columnNum);
 	}
 
 	/*
@@ -211,16 +147,6 @@ public class RowImpl implements IRow {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IRow#getTimestamp(int)
-	 */
-	@Override
-	public Timestamp getTimestamp(int columnNum) throws WrongIndexException {
-		return (Timestamp) get(columnNum);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.q4s.dafobi.trans.IRow#getTimestamp(java.lang.String)
 	 */
 	@Override
@@ -228,6 +154,80 @@ public class RowImpl implements IRow {
 			throws WrongIndexException {
 		int index = rowInfo.getColumnIndex(columnName);
 		return getTimestamp(index);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#get(int)
+	 */
+	@Override
+	public Object get(int columnNum) throws WrongIndexException {
+		if (columnNum < 0 || columnNum >= values.length) {
+			throw new WrongIndexException();
+		}
+		// Ожидается, что все данные будут неизменяемые по своей природе.
+		return values[columnNum];
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getString(int)
+	 */
+	@Override
+	public String getString(int columnNum) throws WrongIndexException {
+		return (String) get(columnNum);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getInteger(int)
+	 */
+	@Override
+	public Long getInteger(int columnNum) throws WrongIndexException {
+		return (Long) get(columnNum);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getDecimal(int)
+	 */
+	@Override
+	public BigDecimal getDecimal(int columnNum) throws WrongIndexException {
+		return (BigDecimal) get(columnNum);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getDate(int)
+	 */
+	@Override
+	public Date getDate(int columnNum) throws WrongIndexException {
+		return (Date) get(columnNum);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getTime(int)
+	 */
+	@Override
+	public Time getTime(int columnNum) throws WrongIndexException {
+		return (Time) get(columnNum);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.IRow#getTimestamp(int)
+	 */
+	@Override
+	public Timestamp getTimestamp(int columnNum) throws WrongIndexException {
+		return (Timestamp) get(columnNum);
 	}
 
 }

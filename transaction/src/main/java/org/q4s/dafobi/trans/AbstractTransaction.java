@@ -42,23 +42,11 @@ public abstract class AbstractTransaction implements ITransaction {
 		}
 	}
 
-	/**
-	 * Сокращенная версия кода:
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * <pre>
-	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	int count = stmt.execute(params);
-	 * 	...
-	 * }
-	 * </pre>
-	 * 
-	 * @param statement
-	 *            Текст оператора, который надо будет выполнять.
-	 * 
-	 * @param parameters
-	 *            Значения параметров, с которыми выполняется запрос.
-	 * 
-	 * @return Количество затронутых запросом строк.
+	 * @see org.q4s.dafobi.trans.ITransaction#execute(java.lang.String,
+	 * java.util.Map)
 	 */
 	@Override
 	public final int execute(final String statement, final Map<String, DataParam> parameters) {
@@ -70,23 +58,11 @@ public abstract class AbstractTransaction implements ITransaction {
 		return count;
 	}
 
-	/**
-	 * Сокращенная версия кода:
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * <pre>
-	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	IResultTable rt = stmt.query(params);
-	 * 	...
-	 * }
-	 * </pre>
-	 * 
-	 * @param statement
-	 *            Текст оператора, который надо будет выполнять.
-	 * 
-	 * @param parameters
-	 *            Значения параметров, с которыми выполняется запрос.
-	 * 
-	 * @return Итератор по полученным строкам.
+	 * @see org.q4s.dafobi.trans.ITransaction#query(java.lang.String,
+	 * java.util.Map)
 	 */
 	@Override
 	public final IResultTable query(final String statement, final Map<String, DataParam> parameters) {

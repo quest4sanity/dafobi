@@ -18,7 +18,12 @@
  */
 package org.q4s.dafobi.trans;
 
+import java.text.MessageFormat;
+
 /**
+ * Данный класс связывает воедино значение и его тип данных {@link DataType}. В
+ * таком виде значение используется в методах {@link IStatement}.
+ * <p>
  * Для получения объекта данного типа проще всего воспользоваться типом данных
  * {@link DataType}. Например так:
  * 
@@ -31,7 +36,14 @@ package org.q4s.dafobi.trans;
  *
  */
 public class DataParam {
+	/**
+	 * Тип параметра.
+	 */
 	private final DataType type;
+
+	/**
+	 * Значение параметра.
+	 */
 	private final Object value;
 
 	/**
@@ -68,6 +80,6 @@ public class DataParam {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return new StringBuilder("DataParam: ").append(type).append("[").append(value).append("]").toString();
+		return MessageFormat.format("DataParam: {0} [{1}]", type, value);
 	}
 }

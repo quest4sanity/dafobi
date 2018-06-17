@@ -48,8 +48,7 @@ public class JdbcResultTable extends AbstractResultTable {
 			int count = meta.getColumnCount();
 			for (int i = 1; i <= count; i++) {
 				// TODO Надо тщательно проверить, как этот код работает
-				addColumnInfo(meta.getColumnName(i),
-						DataType.valueOf(meta.getColumnType(i)));
+				addColumnInfo(meta.getColumnName(i), DataType.valueOf(meta.getColumnType(i)));
 			}
 			protect();
 
@@ -67,7 +66,7 @@ public class JdbcResultTable extends AbstractResultTable {
 	public void close() {
 		try {
 			resultSet.close();
-			
+
 		} catch (SQLException e) {
 			new RuntimeException(e);
 		}
@@ -102,10 +101,10 @@ public class JdbcResultTable extends AbstractResultTable {
 	 * Данный итератор реализует выборку данных из {@link ResultSet}. Поскольку
 	 * {@link ResultSet} не поддерживает упреждающую выборку, то данный итератор
 	 * предполагает, что метод {@link Iterator#hasNext()} алгоритмически всегда
-	 * выполняется перед {@link Iterator#next()}, и последний никогда не
+	 * выполняется перед методом {@link Iterator#next()}, и последний никогда не
 	 * выполняется, если первый вернул false. В случае читтерских попыток вызова
-	 * медода {@link Iterator#next()} будет сгененирована исключительная
-	 * ситуация.
+	 * медода {@link Iterator#next()} минуя вызов {@link Iterator#hasNext()}
+	 * будет сгененирована исключительная ситуация.
 	 * 
 	 * @author Q4S
 	 * 
@@ -155,9 +154,8 @@ public class JdbcResultTable extends AbstractResultTable {
 		public IRow next() {
 			// protection against cheating
 			if (nextRow == null) {
-				throw new RuntimeException(
-						"Method next() must be preceded by a method hasNext() "
-								+ "that must return true.");
+				throw new UnsupportedOperationException(
+						"Method next() must be preceded by a method hasNext() that must return true.");
 			} else {
 				IRow nextRow = this.nextRow;
 				this.nextRow = null;
@@ -167,8 +165,7 @@ public class JdbcResultTable extends AbstractResultTable {
 
 		@Override
 		public void remove() {
-			throw new RuntimeException(
-					"Method remove() can't be used in this kind of iterator");
+			throw new UnsupportedOperationException("Method remove() can't be used in this kind of iterator");
 		}
 	}
 
