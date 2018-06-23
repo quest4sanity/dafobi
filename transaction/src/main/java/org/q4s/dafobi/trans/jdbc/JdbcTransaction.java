@@ -47,22 +47,38 @@ public class JdbcTransaction extends AbstractTransaction {
 	 */
 	@Override
 	public IStatement prepare(final String statement) {
+		// TODO здесь должен быть механизм выбора правильной имплементации
 		return new JdbcStatement(this, statement);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.ITransactionn#getLastError()
+	 * @see org.q4s.dafobi.trans.ITransaction#setAutocommit(boolean)
 	 */
 	@Override
-	public void getLastError() {
-		// try {
-		// connection.getL;
-		//
-		// } catch (SQLException e) {
-		// throw new RuntimeException(e);
-		// }
+	public void setAutocommit(boolean autoCommit) {
+		try {
+			connection.setAutoCommit(autoCommit);
+
+		} catch (SQLException e) {
+			throw new TransactionException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.ITransaction#getAutocommit()
+	 */
+	@Override
+	public boolean getAutocommit() {
+		try {
+			return connection.getAutoCommit();
+
+		} catch (SQLException e) {
+			throw new TransactionException(e);
+		}
 	}
 
 	/*
@@ -98,31 +114,16 @@ public class JdbcTransaction extends AbstractTransaction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.ITransaction#setAutocommit(boolean)
+	 * @see org.q4s.dafobi.trans.ITransactionn#getLastError()
 	 */
 	@Override
-	public void setAutocommit(boolean autoCommit) {
-		try {
-			connection.setAutoCommit(autoCommit);
-
-		} catch (SQLException e) {
-			throw new TransactionException(e);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.ITransaction#getAutocommit()
-	 */
-	@Override
-	public boolean getAutocommit() {
-		try {
-			return connection.getAutoCommit();
-
-		} catch (SQLException e) {
-			throw new TransactionException(e);
-		}
+	public void getLastError() {
+		// try {
+		// connection.getL;
+		//
+		// } catch (SQLException e) {
+		// throw new RuntimeException(e);
+		// }
 	}
 
 }

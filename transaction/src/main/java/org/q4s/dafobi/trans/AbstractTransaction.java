@@ -19,28 +19,13 @@
 package org.q4s.dafobi.trans;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * 
  * @author Q4S
  */
 public abstract class AbstractTransaction implements ITransaction {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.q4s.dafobi.trans.ITransaction#close()
-	 */
-	@Override
-	public void close() {
-		// Изменения должны фиксировать явно с помощью оператора commit
-		// кроме случаев, когда установлен флаг autocommit.
-		if (getAutocommit()) {
-			commit();
-		} else {
-			rollback();
-		}
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -61,6 +46,24 @@ public abstract class AbstractTransaction implements ITransaction {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.q4s.dafobi.trans.ITransaction#executeScript(java.lang.String,
+	 * java.util.Map)
+	 */
+	@Override
+	public final int[] executeScript(String script, Map<String, DataParam> parameters) {
+		String[] operators = parseScript(script);
+		int[] rc = new int[operators.length];
+		
+		int i=0;
+		for (String operator : operators) {
+			rc[i++] = execute(operator, parameters);
+		}
+		return rc;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.q4s.dafobi.trans.ITransaction#query(java.lang.String,
 	 * java.util.Map)
 	 */
@@ -73,4 +76,41 @@ public abstract class AbstractTransaction implements ITransaction {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.trans.ITransaction#close()
+	 */
+	@Override
+	public void close() {
+		// Изменения должны фиксировать явно с помощью оператора commit
+		// кроме случаев, когда установлен флаг autocommit.
+		if (getAutocommit()) {
+			commit();
+		} else {
+			rollback();
+		}
+	}
+
+	/**
+	 * Метод берет текст скрипта и разбирает его на операторы. Операторы могут
+	 * представлять собой как DDL, так и вызовы процедур.
+	 * 
+	 * @param script
+	 *            Текст скрипта из нескольких операторов.
+	 * 
+	 * @return Список текстов операторов, каждый из которых может быть выполнен
+	 *         методом {@link #execute(String, Map)}.
+	 */
+	public String[] parseScript(String script) {
+		
+		// Здесь используется самый простой подход - разделителем 
+		// операторов считается строка, состоящая только из одного
+		// символа '/'.
+		String deviderStr = "\\n[\\s]*\\/[\\s]*\\n";
+		Pattern p = Pattern.compile(deviderStr, Pattern.DOTALL
+				| Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
+		String[] operators = p.split(script + "\n");
+		return operators;
+	}
 }

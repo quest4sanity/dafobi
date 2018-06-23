@@ -64,6 +64,39 @@ public interface ITransaction extends AutoCloseable {
 	public int execute(final String statement, final Map<String, DataParam> parameters);
 
 	/**
+	 * Часто бывает желательно выполнить не один оператор, а сразу несколько,
+	 * объединенных в один текстовый файл (такой файл называется скриптом).
+	 * 
+	 * <pre>
+	 * try (IStatement stmt = transaction.prepare(sql);) {
+	 * 	int count = stmt.execute(params);
+	 * 	...
+	 * }
+	 * </pre>
+	 * 
+	 * @see IStatement#execute(Map)
+	 * 
+	 * @param script
+	 *            Текст скрипта, который надо будет выполнить. Один скрипт может
+	 *            содержать несколько операторов, которые будут выполняться в
+	 *            порядке следования.
+	 * 
+	 * @param parameters
+	 *            Значения параметров, с которыми будут выполняться все
+	 *            операторы. Если оператор представляет собой вызов процедуры с
+	 *            выходными параметрами, то значения выходных параметров будут
+	 *            записаны в карту и смогут впоследствии быть использованы
+	 *            следующими по порядку операторами.
+	 * 
+	 * @return Количество затронутых каждым из операторов строк. Если оператор
+	 *         представляет собой вызов процедуры, то количество равно 0.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public int[] executeScript(final String script, final Map<String, DataParam> parameters);
+
+	/**
 	 * Сокращенная версия кода:
 	 * 
 	 * <pre>

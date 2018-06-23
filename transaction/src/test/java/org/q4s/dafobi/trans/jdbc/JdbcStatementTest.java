@@ -77,7 +77,7 @@ public class JdbcStatementTest {
 		}
 
 		// Creating second the procedure
-		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc2.sql");
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc_query.sql");
 				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
@@ -203,7 +203,7 @@ public class JdbcStatementTest {
 	}
 
 	/**
-	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}.
+	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}
 	 * <p>
 	 * Пример получения одной строики (по ид.) с помощью процедуры. 
 	 */
@@ -226,7 +226,7 @@ public class JdbcStatementTest {
 	}
 
 	/**
-	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}.
+	 * Test method for {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#query()}
 	 * <p>
 	 * Пример получения нескольких строк. 
 	 */
@@ -254,7 +254,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.AbstractStatement#query(java.util.Map)}.
+	 * {@link org.q4s.dafobi.trans.AbstractStatement#query(java.util.Map)}
 	 */
 	@Test
 	public void testQueryMapOfStringObject() {
@@ -294,7 +294,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.AbstractStatement#execute(java.util.Map)}.
+	 * {@link org.q4s.dafobi.trans.AbstractStatement#execute(java.util.Map)}
 	 */
 	@Test
 	public void testExecuteMapOfStringObject() {
@@ -312,7 +312,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeUpdate()}.
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeUpdate()}
 	 */
 	@Test
 	public void testExecuteUpdate() {
@@ -330,7 +330,6 @@ public class JdbcStatementTest {
 	/**
 	 * Test method for
 	 * {@link org.q4s.dafobi.trans.AbstractStatement#executeUpdate(java.util.Map)}
-	 * .
 	 */
 	@Test
 	public void testExecuteUpdateMapOfStringObject() {
@@ -349,7 +348,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeBatch()}.
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcStatement#executeBatch()}
 	 */
 	@Test
 	public void testExecuteBatch() {
@@ -373,7 +372,7 @@ public class JdbcStatementTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.AbstractStatement#addBatch(java.util.Map)}.
+	 * {@link org.q4s.dafobi.trans.AbstractStatement#addBatch(java.util.Map)}
 	 */
 	@Test
 	public void testExecuteBatchMapOfStringObject() {
