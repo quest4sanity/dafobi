@@ -41,7 +41,7 @@ public interface IResultTable extends Iterable<IRow>, AutoCloseable {
 	/**
 	 * @return Число колонок в таблице
 	 */
-	public int getCount();
+	public int count();
 
 	/**
 	 * Возвращает имя колонки (например, алиас колонки в запросе).

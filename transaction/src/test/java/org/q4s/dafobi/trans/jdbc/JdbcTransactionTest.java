@@ -165,7 +165,7 @@ public class JdbcTransactionTest {
 		}
 	}
 
-	private Long getRowCount() {
+	private long getRowCount() {
 		IRow row = getOneRow("SELECT count(*) as c FROM TEST");
 		return row.getInteger("c");
 	}
@@ -175,7 +175,7 @@ public class JdbcTransactionTest {
 	 */
 	@Test
 	public void testSimpleQuery() {
-		assertEquals(new Long(2), getRowCount());
+		assertEquals(2l, getRowCount());
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class JdbcTransactionTest {
 				+ "VALUES(:id, :str, :dt)", parameters);
 
 		assertEquals(1, rc);
-		assertEquals(new Long(3), getRowCount());
+		assertEquals(3l, getRowCount());
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class JdbcTransactionTest {
 			int[] rc = transaction.executeScript(script, parameters);
 
 			Assert.assertArrayEquals(new int[] { 2, 4, 1 }, rc);
-			assertEquals(new Long(7), getRowCount());
+			assertEquals(7l, getRowCount());
 		}
 	}
 

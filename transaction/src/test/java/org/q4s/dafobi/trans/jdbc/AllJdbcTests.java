@@ -24,6 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ HsqldbTest.class, //
+		JdbcResultTableTest.class, //
 		JdbcStatementInternalTest.class, //
 		JdbcStatementTest.class, //
 		JdbcTransactionTest.class })

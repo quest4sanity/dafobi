@@ -33,10 +33,27 @@ public class TransactionException extends RuntimeException {
 	 */
 	private final String operator;
 
+	/**
+	 * Исключительная ситуация, возникающая из-за ошибок во время выполнения
+	 * операторов транзакции.
+	 * 
+	 * @param e
+	 *            Исключение, возникшее в процессе выполнения транзакции.
+	 */
 	public TransactionException(SQLException e) {
 		this(e.getSQLState(), e.getErrorCode(), e.getMessage(), null);
 	}
 
+	/**
+	 * Исключительная ситуация, возникающая из-за ошибок во время выполнения
+	 * операторов транзакции.
+	 * 
+	 * @param e
+	 *            Исключение, возникшее в процессе выполнения транзакции.
+	 * 
+	 * @param operator
+	 *            Оператор, вызвавший исключительную ситуацию.
+	 */
 	public TransactionException(SQLException e, String operator) {
 		this(e.getSQLState(), e.getErrorCode(), e.getMessage(), operator);
 	}

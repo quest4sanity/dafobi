@@ -122,7 +122,7 @@ public class JdbcResultTable extends AbstractResultTable {
 
 				boolean rc = resultSet.next();
 				if (rc) {
-					int count = getCount();
+					int count = count();
 					Object[] values = new Object[count];
 					for (int i = 0; i < count; i++) {
 						values[i] = resultSet.getObject(i + 1);

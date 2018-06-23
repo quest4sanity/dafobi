@@ -69,8 +69,8 @@ public class AutoclosableResultTable implements IResultTable {
 	}
 
 	@Override
-	public int getCount() {
-		return resultTable.getCount();
+	public int count() {
+		return resultTable.count();
 	}
 
 	@Override

@@ -107,12 +107,13 @@ public class JdbcStatement extends AbstractStatement {
 			// включает в себя только удаление комментариев.
 			processedQuery = processQuery(parsedQuery);
 
-			// Процедурные запрос и обычные отрабатываются по разному.
+			// Процедурные запрос и обычные (DDL и т.п.) отрабатываются по
+			// разному.
 			//
 			isCallable = isOperatorCallable(processedQuery);
 			if (!isCallable && getOutParamNames().length > 0) {
-				// TODO Надо поменять на что-то вменяемое.
-				throw new RuntimeException("Возвращаемые параметры можно использовать только в вызываемых операторах.");
+				throw new UnsupportedOperationException(MessageFormat.format(
+						"Выходные параметры можно использовать только в вызываемых операторах: ", getParsedQuery()));
 			}
 
 			Connection connection = transaction.getConnection();
@@ -507,12 +508,12 @@ public class JdbcStatement extends AbstractStatement {
 	public IResultTable query() {
 		try {
 			if (isCallable()) {
-				boolean rc = statement.execute();
+				statement.execute();
 				if (statement.getMoreResults()) {
 					return new JdbcResultTable(this, statement.getResultSet());
 				} else {
-					// TODO Надо поменять на что-то вменяемое.
-					throw new RuntimeException("Оператор не вернул ResultSet");
+					throw new UnsupportedOperationException(MessageFormat
+							.format("Оператор не вернул ResultSet как ожидалось: \"{0}\"", getProcessedQuery()));
 				}
 
 			} else {
@@ -545,6 +546,8 @@ public class JdbcStatement extends AbstractStatement {
 		}
 	}
 
+	private final String WRONG_BATCH_OPERATOR = "Вызываемый оператор не может использоваться в пакете: \"{0}\"";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -554,8 +557,8 @@ public class JdbcStatement extends AbstractStatement {
 	public void addBatch() {
 		try {
 			if (isCallable()) {
-				// TODO Надо поменять на что-то вменяемое.
-				throw new RuntimeException("Вызываемый оператор не может использоваться в пакете");
+				throw new UnsupportedOperationException(
+						MessageFormat.format(WRONG_BATCH_OPERATOR, getProcessedQuery()));
 			} else {
 				statement.addBatch();
 			}
@@ -574,8 +577,8 @@ public class JdbcStatement extends AbstractStatement {
 	public int[] executeBatch() {
 		try {
 			if (isCallable()) {
-				// TODO Надо поменять на что-то вменяемое.
-				throw new RuntimeException("Вызываемый оператор не может использоваться в пакете");
+				throw new UnsupportedOperationException(
+						MessageFormat.format(WRONG_BATCH_OPERATOR, getProcessedQuery()));
 			} else {
 				return statement.executeBatch();
 			}

@@ -166,7 +166,7 @@ public class JdbcStatementTest {
 		throw new RuntimeException("Запрос не вернул ни одной строки");
 	}
 
-	private Long getRowCount() {
+	private long getRowCount() {
 		IRow row = getOneRow("SELECT count(*) as c FROM TEST");
 		return row.getInteger("c");
 	}
@@ -176,7 +176,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testSimpleQuery() {
-		assertEquals(new Long(2), getRowCount());
+		assertEquals(2l, getRowCount());
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class JdbcStatementTest {
 			statement.setParam("dt", DataType.DATE.param(new Date(2000)));
 			statement.execute();
 
-			assertEquals(new Long(3), getRowCount());
+			assertEquals(3l, getRowCount());
 		}
 	}
 
@@ -342,7 +342,7 @@ public class JdbcStatementTest {
 
 			statement.execute(params);
 
-			assertEquals(new Long(3), getRowCount());
+			assertEquals(3l, getRowCount());
 		}
 	}
 
@@ -366,7 +366,7 @@ public class JdbcStatementTest {
 
 			statement.executeBatch();
 
-			assertEquals(new Long(4), getRowCount());
+			assertEquals(4l, getRowCount());
 		}
 	}
 
@@ -391,7 +391,7 @@ public class JdbcStatementTest {
 
 			statement.executeBatch();
 
-			assertEquals(new Long(4), getRowCount());
+			assertEquals(4l, getRowCount());
 		}
 	}
 

@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс описывает метаинформацию о строке данных. Сюда входят: имена столбцов,
- * типы данных, классы и т.п.
+ * Класс описывает метаинформацию заголовка таблицы данных. Сюда входят: имена
+ * столбцов, типы данных, классы и т.п.
  * 
  * @author Q4S
  */
@@ -44,23 +44,21 @@ public abstract class AbstractResultTable implements IResultTable {
 		final DataType type;
 
 		public ColumnMetaInfo(String name, DataType type) {
-			this.name = name;
+			this.name = name.toLowerCase();
 			this.type = type;
 		}
 	}
 
+	/**
+	 * Список описаний колонок. Список используется как временное хранилище на
+	 * этапе накопления информации. Потом данные переписываются в массив.
+	 */
 	private List<ColumnMetaInfo> columnMetaList = new ArrayList<ColumnMetaInfo>();
 
-	private ColumnMetaInfo[] columnMeta;
-
 	/**
-	 * Если значение переменной false, то можно добавлять информацию, но нельзя
-	 * ее читать. Если она равна true, то можно читать информацию, но больше
-	 * нельзя ее добавлять. Включение защиты метаинформации делает класс
-	 * неизменяемым. Причем, вернуть класс обратно к изменяемому состоянию
-	 * невозможно.
+	 * Массив описаний колонок.
 	 */
-	private boolean protect;
+	private ColumnMetaInfo[] columnMeta = null;
 
 	/**
 	 * Метод добавляет информацию о колонке данных для строки. Индекс колонки
@@ -72,10 +70,10 @@ public abstract class AbstractResultTable implements IResultTable {
 	 * @param Type
 	 *            Тип колонки
 	 */
-	protected void addColumnInfo(String name, DataType type) {
-		if (protect) {
-			// TODO Написать внятное сообщение
-			throw new RuntimeException();
+	protected final void addColumnInfo(String name, DataType type) {
+		if (isProtected()) {
+			throw new UnsupportedOperationException(
+					"Можно добавлять информацию о новых колонках только, пока данные не закрыты для изменения");
 		} else {
 			columnMetaList.add(new ColumnMetaInfo(name, type));
 		}
@@ -85,31 +83,30 @@ public abstract class AbstractResultTable implements IResultTable {
 	/**
 	 * Метод делает класс неизменяемым (на случай шаловливых ручек).
 	 */
-	protected void protect() {
-		// TODO Написать внятное сообщение
-		if (protect) {
-			throw new RuntimeException();
+	protected final void protect() {
+		if (isProtected()) {
+			throw new UnsupportedOperationException("Данные уже были закрыты для изменения");
 		} else {
 			columnMeta = columnMetaList.toArray(new ColumnMetaInfo[0]);
 			columnMetaList = null;
-			protect = true;
 		}
 	}
 
-	protected boolean isProtected() {
-		return protect;
+	protected final boolean isProtected() {
+		return columnMeta != null;
 	}
+
+	private final String INFO_IS_NOT_PROTECTED_YET = "Нельзя пользоваться информацией о таблице, пока она не защищена";
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.q4s.dafobi.trans.IResultTable#getCount()
+	 * @see org.q4s.dafobi.trans.IResultTable#count()
 	 */
 	@Override
-	public int getCount() {
-		// TODO Реализовать метод
-		if (!protect) {
-			throw new RuntimeException();
+	public final int count() {
+		if (!isProtected()) {
+			throw new UnsupportedOperationException(INFO_IS_NOT_PROTECTED_YET);
 		}
 		return columnMeta.length;
 	}
@@ -120,10 +117,9 @@ public abstract class AbstractResultTable implements IResultTable {
 	 * @see org.q4s.dafobi.trans.IResultTable#getColumnIndex(java.lang.String)
 	 */
 	@Override
-	public int getColumnIndex(String name) {
-		// TODO Реализовать метод
-		if (!protect) {
-			throw new RuntimeException();
+	public final int getColumnIndex(String name) {
+		if (!isProtected()) {
+			throw new UnsupportedOperationException(INFO_IS_NOT_PROTECTED_YET);
 		}
 		for (int i = 0; i < columnMeta.length; i++) {
 			if (columnMeta[i].name.equalsIgnoreCase(name)) {
@@ -139,10 +135,9 @@ public abstract class AbstractResultTable implements IResultTable {
 	 * @see org.q4s.dafobi.trans.IResultTable#getColumnName(int)
 	 */
 	@Override
-	public String getColumnName(int index) {
-		// TODO Реализовать метод
-		if (!protect) {
-			throw new RuntimeException();
+	public final String getColumnName(int index) {
+		if (!isProtected()) {
+			throw new UnsupportedOperationException(INFO_IS_NOT_PROTECTED_YET);
 		}
 		return columnMeta[index].name;
 	}
@@ -153,10 +148,9 @@ public abstract class AbstractResultTable implements IResultTable {
 	 * @see org.q4s.dafobi.trans.IResultTable#getColumnType(int)
 	 */
 	@Override
-	public DataType getColumnType(int index) {
-		// TODO Реализовать метод
-		if (!protect) {
-			throw new RuntimeException();
+	public final DataType getColumnType(int index) {
+		if (!isProtected()) {
+			throw new UnsupportedOperationException(INFO_IS_NOT_PROTECTED_YET);
 		}
 		return columnMeta[index].type;
 	}
@@ -164,7 +158,7 @@ public abstract class AbstractResultTable implements IResultTable {
 	/**
 	 * @return Оператор, вернувший данный набор данных.
 	 */
-	public IStatement getStatement() {
+	public final IStatement getStatement() {
 		return statement;
 	}
 
