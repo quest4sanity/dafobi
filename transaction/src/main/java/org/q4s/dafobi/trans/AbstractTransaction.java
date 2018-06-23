@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
+ * Данный класс реализует общую часть функционала, которую должна реализовывать
+ * транзакция.
  * 
  * @author Q4S
  */
@@ -53,8 +55,8 @@ public abstract class AbstractTransaction implements ITransaction {
 	public final int[] executeScript(String script, Map<String, DataParam> parameters) {
 		String[] operators = parseScript(script);
 		int[] rc = new int[operators.length];
-		
-		int i=0;
+
+		int i = 0;
 		for (String operator : operators) {
 			rc[i++] = execute(operator, parameters);
 		}
@@ -79,6 +81,22 @@ public abstract class AbstractTransaction implements ITransaction {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.q4s.dafobi.trans.ITransaction#queryRow(java.lang.String,
+	 * java.util.Map)
+	 */
+	@Override
+	public final IRow queryRow(final String statement, final Map<String, DataParam> parameters) {
+		try (IResultTable result = query(statement, parameters)) {
+			for (IRow row : result) {
+				return row;
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.q4s.dafobi.trans.ITransaction#close()
 	 */
 	@Override
@@ -94,7 +112,7 @@ public abstract class AbstractTransaction implements ITransaction {
 
 	/**
 	 * Метод берет текст скрипта и разбирает его на операторы. Операторы могут
-	 * представлять собой как DDL, так и вызовы процедур.
+	 * представлять собой как опеаторы DDL, так и вызовы процедур.
 	 * 
 	 * @param script
 	 *            Текст скрипта из нескольких операторов.
@@ -103,13 +121,12 @@ public abstract class AbstractTransaction implements ITransaction {
 	 *         методом {@link #execute(String, Map)}.
 	 */
 	public String[] parseScript(String script) {
-		
-		// Здесь используется самый простой подход - разделителем 
+		// Ниже реализован самый примитивный подход - разделителем
 		// операторов считается строка, состоящая только из одного
-		// символа '/'.
+		// символа '/'. При этом не учитывается, что она может находиться
+		// в стоковой константе или в комментарии.
 		String deviderStr = "\\n[\\s]*\\/[\\s]*\\n";
-		Pattern p = Pattern.compile(deviderStr, Pattern.DOTALL
-				| Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
+		Pattern p = Pattern.compile(deviderStr, Pattern.DOTALL | Pattern.UNIX_LINES | Pattern.UNICODE_CASE);
 		String[] operators = p.split(script + "\n");
 		return operators;
 	}

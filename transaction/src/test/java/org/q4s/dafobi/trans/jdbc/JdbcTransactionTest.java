@@ -157,12 +157,12 @@ public class JdbcTransactionTest {
 	 * @return Первая строка данных, возвращенная запросом.
 	 */
 	private IRow getOneRow(String query) {
-		try (IResultTable result = transaction.query(query, new TreeMap<String, DataParam>())) {
-			for (IRow row : result) {
-				return row;
-			}
+		IRow row = transaction.queryRow(query, new TreeMap<String, DataParam>());
+		if (row == null) {
+			throw new RuntimeException("Запрос не вернул ни одной строки");
+		} else {
+			return row;
 		}
-		throw new RuntimeException("Запрос не вернул ни одной строки");
 	}
 
 	private Long getRowCount() {

@@ -122,6 +122,30 @@ public interface ITransaction extends AutoCloseable {
 	public IResultTable query(final String statement, final Map<String, DataParam> parameters);
 
 	/**
+	 * Часто бывает нужно выполнить запрос, возвращающий только одну строку. В
+	 * этом случае нет необходимости писать код, отрабатывающий получение сразу
+	 * нескольких строк и освобождающий после этого ресурсы.
+	 * <p>
+	 * Данный метод всегда возвращает первую строку, которую вернул запрос, а
+	 * после этого освобождает все ресурсы.
+	 * 
+	 * @see IStatement#query(Map)
+	 * 
+	 * @param statement
+	 *            Текст оператора, который надо будет выполнить.
+	 * 
+	 * @param parameters
+	 *            Значения параметров, с которыми выполняется запрос.
+	 * 
+	 * @return Первая строка, которую вернул запрос. Если оператор не вернул
+	 *         ничего, то значение будет null.
+	 * 
+	 * @throws TransactionException
+	 *             if an error occurred
+	 */
+	public IRow queryRow(final String statement, final Map<String, DataParam> parameters);
+
+	/**
 	 * @param flag
 	 *            true - приводит к тому, что commit будет делаться после
 	 *            каждого оператора; false - приводит к тому, что commit надо
