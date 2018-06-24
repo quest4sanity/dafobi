@@ -5,8 +5,8 @@
 	<artifactId>dafobi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>dafobi</name>
-	<description>Инструмент графического построения форм работы с данными.</description>
+	<name>Проект построителя форм</name>
+	<description>Инструмент графического построения форм, работающих с данными, находящимися в базе данных или в любом другом внешнем хранилище.</description>
 
 	<licenses>
 		<license>

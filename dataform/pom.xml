@@ -10,7 +10,6 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>dataform</name>
 	<description>Модуль работы с локальными хранилищами данных и формами данных.</description>
 
 	<licenses>
@@ -104,4 +103,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	<name>Реализация функционала форм данных</name>
 </project>

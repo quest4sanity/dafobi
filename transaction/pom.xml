@@ -10,7 +10,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>transaction</name>
+	<name>Реализация функционала транзакций</name>
 	<description>Средство, обеспечивающее работу с транзакциями.</description>
 
     <licenses>

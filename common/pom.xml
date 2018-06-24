@@ -4,8 +4,7 @@
 	<groupId>org.q4s.dafobi</groupId>
 	<artifactId>common</artifactId>
 
-	<name>common</name>
-	<description>.</description>
+	<name>Общий функционал</name>
 
     <licenses>
         <license>
@@ -78,4 +77,5 @@
 	</build>
 
 
+	<description>Разнообразный функционал, который, с одной стороны, совершенно автономен, а с другой, может понадобиться в любом из модулей проекта. </description>
 </project>
