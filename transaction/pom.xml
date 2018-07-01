@@ -13,25 +13,25 @@
 	<name>Реализация функционала транзакций</name>
 	<description>Средство, обеспечивающее работу с транзакциями.</description>
 
-    <licenses>
-        <license>
-            <name>LGPL-3</name>
-            <url>https://www.gnu.org/licenses/lgpl.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>LGPL-3</name>
+			<url>https://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.q4s.dafobi</groupId>
 			<artifactId>common</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -70,6 +70,7 @@
 		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
 				<includes>
 					<include>**/*.sql</include>
 					<include>**/*.properties</include>

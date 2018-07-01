@@ -74,6 +74,7 @@
 		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
 				<includes>
 					<include>**/*.sql</include>
 					<include>**/*.properties</include>

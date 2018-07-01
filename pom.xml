@@ -23,6 +23,13 @@
 		<module>dataform</module>
 	</modules>
 
+	<scm>
+		<connection>scm:git:https://github.com/quest4sanity/dafobi.git</connection>
+		<developerConnection>scm:git:https://github.com/quest4sanity/dafobi.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/quest4sanity/dafobi.git</url>
+	</scm>
+
 	<distributionManagement>
 		<repository>
 			<id>deploymentRepo</id>
@@ -93,7 +100,44 @@
 	</dependencyManagement>
 
 	<build>
-		
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>
+							<Implementation-Build>${scmBranch}</Implementation-Build>
+<!-- 							<Main-Class>com.habrahabr.example.GitRevisionApplication</Main-Class>  -->
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -106,18 +150,13 @@
 						<encoding>${project.build.sourceEncoding}</encoding>
 					</configuration>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.21.0</version>
-<!-- 
-					<configuration>
-						<includes>
-							<include>Sample.java</include>
-						</includes>
-					</configuration>
- -->
+					<!-- <configuration> <includes> <include>Sample.java</include> </includes> 
+						</configuration> -->
 				</plugin>
 			</plugins>
 		</pluginManagement>
