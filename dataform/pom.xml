@@ -10,6 +10,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+	<name>Реализация функционала форм данных</name>
 	<description>Модуль работы с локальными хранилищами данных и формами данных.</description>
 
 	<licenses>
@@ -34,6 +35,16 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
 		</dependency>
 
 		<dependency>
@@ -102,7 +113,32 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>schemagen</id>
+						<goals>
+							<goal>schemagen</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${basedir}/src/main/java/schemas</outputDirectory>
+					<sources>
+						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb/dataform</source>
+					</sources>
+					<transformSchemas>
+						<transformSchema>
+							<uri>http://www.q4s.org/dafobi/dataform</uri>
+							<toPrefix>df</toPrefix>
+							<toFile>dataform.xsd</toFile>
+						</transformSchema>
+					</transformSchemas>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-	<name>Реализация функционала форм данных</name>
 </project>
