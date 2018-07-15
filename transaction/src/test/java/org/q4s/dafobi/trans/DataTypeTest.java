@@ -29,6 +29,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.q4s.dafobi.jaxb.trans.DataType;
 
 public class DataTypeTest {
 

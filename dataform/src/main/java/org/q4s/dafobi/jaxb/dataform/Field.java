@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.q4s.dafobi.jaxb.common.Documentation;
+
 /**
  * <p>
  * Java class for anonymous complex type.
@@ -29,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "field")
 public class Field {
 
+    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
 	protected Documentation documentation;
 
 	protected int tabindex;

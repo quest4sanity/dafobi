@@ -16,13 +16,20 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.trans;
+package org.q4s.dafobi.jaxb.trans;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
+
+import org.q4s.dafobi.trans.DataParam;
+import org.q4s.dafobi.trans.IStatement;
+import org.q4s.dafobi.trans.ITransaction;
 
 /**
  * Типы данных, с которыми умеет работать система, а так же ряда методов для
@@ -31,6 +38,8 @@ import java.text.MessageFormat;
  * @author Q4S
  * 
  */
+@XmlType(namespace = "http://www.q4s.org/dafobi/trans", name = "dataType")
+@XmlEnum
 public enum DataType {
 
 	/**
@@ -198,6 +207,10 @@ public enum DataType {
 		}
 		throw new IllegalArgumentException(MessageFormat.format("Класс {0} не может быть преобразован к типу {1}.",
 				value.getClass().getName(), this));
+	}
+
+	public static DataType fromValue(String v) {
+		return valueOf(v);
 	}
 
 	/**

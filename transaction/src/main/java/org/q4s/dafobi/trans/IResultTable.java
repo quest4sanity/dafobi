@@ -18,6 +18,8 @@
  */
 package org.q4s.dafobi.trans;
 
+import org.q4s.dafobi.jaxb.trans.DataType;
+
 public interface IResultTable extends Iterable<IRow>, AutoCloseable {
 
 	/**

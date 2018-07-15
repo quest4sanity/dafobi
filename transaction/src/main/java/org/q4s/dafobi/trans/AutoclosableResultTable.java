@@ -20,6 +20,8 @@ package org.q4s.dafobi.trans;
 
 import java.util.Iterator;
 
+import org.q4s.dafobi.jaxb.trans.DataType;
+
 /**
  * Особенностью данного класса является то, что при закрытии его командой
  * {@link #close()} так же будет закрыт породивший его оператор

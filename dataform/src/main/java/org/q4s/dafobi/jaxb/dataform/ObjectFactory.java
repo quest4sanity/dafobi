@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
+import org.q4s.dafobi.jaxb.common.Documentation;
+
 
 /**
  * This object contains factory methods for each 
@@ -74,11 +76,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Operators }
+     * Create an instance of {@link Operations }
      * 
      */
-    public Operators createDbqueries() {
-        return new Operators();
+    public Operations createDbqueries() {
+        return new Operations();
     }
 
     /**

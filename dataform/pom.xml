@@ -117,26 +117,31 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>schemagen</id>
-						<goals>
-							<goal>schemagen</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
-					<outputDirectory>${basedir}/src/main/java/schemas</outputDirectory>
+					<episodeFileName>dataform</episodeFileName>
 					<sources>
-						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb/dataform</source>
+						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb</source>
+						<source>${basedir}/../common/src/main/java/org/q4s/dafobi/jaxb/common</source>
+						<source>${basedir}/../transaction/src/main/java/org/q4s/dafobi/jaxb/trans</source>
 					</sources>
 					<transformSchemas>
 						<transformSchema>
+							<uri>http://www.q4s.org/dafobi/common</uri>
+							<toPrefix>c</toPrefix>
+							<toFile>common.xsd</toFile>
+						</transformSchema>
+						<transformSchema>
+							<uri>http://www.q4s.org/dafobi/trans</uri>
+							<toPrefix>t</toPrefix>
+							<toFile>trans.xsd</toFile>
+						</transformSchema>
+						<transformSchema>
 							<uri>http://www.q4s.org/dafobi/dataform</uri>
-							<toPrefix>df</toPrefix>
+							<toPrefix>d</toPrefix>
 							<toFile>dataform.xsd</toFile>
 						</transformSchema>
 					</transformSchemas>
+					<!-- <xsdPathWithinArtifact>generated/xsd</xsdPathWithinArtifact> -->
 				</configuration>
 			</plugin>
 		</plugins>

@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.q4s.dafobi.jaxb.common.Documentation;
+import org.q4s.dafobi.jaxb.trans.DataType;
+
 /**
  * <p>
  * Java class for anonymous complex type.
@@ -24,17 +27,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "parameter")
 public class Parameter {
 
-	@XmlElement(required = true)
+    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
 	protected Documentation documentation;
-	
-	@XmlElement(required = true)
+
+    @XmlElement(name = "datatype", namespace = "http://www.q4s.org/dafobi/trans", required = true)
 	protected DataType datatype;
-	
+
 	protected Boolean required;
-	
+
 	@XmlElement(name = "default")
 	protected String _default;
-	
+
 	@XmlAttribute(name = "code", required = true)
 	protected String code;
 

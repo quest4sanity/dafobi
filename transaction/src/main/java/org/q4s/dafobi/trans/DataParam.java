@@ -20,6 +20,8 @@ package org.q4s.dafobi.trans;
 
 import java.text.MessageFormat;
 
+import org.q4s.dafobi.jaxb.trans.DataType;
+
 /**
  * Данный класс связывает воедино значение и его тип данных {@link DataType}. В
  * таком виде значение используется в методах {@link IStatement}.

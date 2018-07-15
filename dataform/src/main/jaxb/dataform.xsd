@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="http://www.q4s.org/dafobi/common" xmlns:d="http://www.q4s.org/dafobi/dataform" xmlns:t="http://www.q4s.org/dafobi/trans" elementFormDefault="qualified" targetNamespace="http://www.q4s.org/dafobi/dataform" version="1.0">
+
+  <xs:import namespace="http://www.q4s.org/dafobi/trans" schemaLocation="trans.xsd"/>
+
+  <xs:import namespace="http://www.q4s.org/dafobi/common" schemaLocation="common.xsd"/>
+
+  <xs:element name="column">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="group" type="xs:string"/>
+        <xs:element name="datatype" type="t:dataType"/>
+        <xs:element minOccurs="0" name="alias" type="xs:string"/>
+        <xs:element minOccurs="0" name="default" type="xs:string"/>
+        <xs:element minOccurs="0" name="expression" type="xs:string"/>
+      </xs:sequence>
+      <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="dataform" type="d:dataform"/>
+
+  <xs:element name="field">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="c:documentation"/>
+        <xs:element name="tabindex" type="xs:int"/>
+        <xs:element name="fieldtype" type="xs:string"/>
+        <xs:element minOccurs="0" name="parameters">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="parameter">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element form="unqualified" name="expression" type="xs:string"/>
+                  </xs:sequence>
+                  <xs:attribute name="ref" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="columns">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="column">
+                <xs:complexType>
+                  <xs:sequence/>
+                  <xs:attribute name="code" type="xs:string"/>
+                  <xs:attribute name="ref" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="state" type="d:fieldState"/>
+      </xs:sequence>
+      <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="operations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="preselect" type="xs:string"/>
+        <xs:element name="select" type="xs:string"/>
+        <xs:element minOccurs="0" name="postselect" type="xs:string"/>
+        <xs:element minOccurs="0" name="existsrow" type="xs:string"/>
+        <xs:element minOccurs="0" name="presave" type="xs:string"/>
+        <xs:element minOccurs="0" name="checkrow" type="xs:string"/>
+        <xs:element minOccurs="0" name="insertrow" type="xs:string"/>
+        <xs:element minOccurs="0" name="updaterow" type="xs:string"/>
+        <xs:element minOccurs="0" name="deleterow" type="xs:string"/>
+        <xs:element minOccurs="0" name="postsave" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="c:documentation"/>
+        <xs:element name="datatype" type="t:dataType"/>
+        <xs:element minOccurs="0" name="required" type="xs:boolean"/>
+        <xs:element minOccurs="0" name="default" type="xs:string"/>
+      </xs:sequence>
+      <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tabindex" type="xs:int"/>
+
+  <xs:complexType name="dataform">
+    <xs:annotation>
+      <xs:documentation><![CDATA[<p>Java class для описания структуры формы данных.]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="c:documentation"/>
+      <xs:element minOccurs="0" name="parameters">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Параметры, которые ожидает форма для своей работы.]]></xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="d:parameter"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" ref="d:operations"/>
+      <xs:element minOccurs="0" name="columns">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Колонки, содержащиеся в таблице данных формы.]]></xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="d:column"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="fields">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Поля, определенные для формы.]]></xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="d:field"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation><![CDATA[Символьный код формы]]></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="fieldState">
+    <xs:annotation>
+      <xs:documentation><![CDATA[<p>
+Java class for fieldState complex type.]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="visible" type="xs:string"/>
+      <xs:element minOccurs="0" name="enabled" type="xs:string"/>
+      <xs:element minOccurs="0" name="required" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

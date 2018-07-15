@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlType;
     "postsave"
 })
 //@formatter:on
-@XmlRootElement(name = "operators")
-public class Operators {
+@XmlRootElement(name = "operations")
+public class Operations {
 
 	protected String preselect;
 

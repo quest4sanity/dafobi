@@ -22,6 +22,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.q4s.dafobi.jaxb.trans.DataType;
+
 /**
  * Класс описывает метаинформацию заголовка таблицы данных. Сюда входят: имена
  * столбцов, типы данных, классы и т.п.

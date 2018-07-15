@@ -5,51 +5,71 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.*;
 
+import org.q4s.dafobi.jaxb.common.Documentation;
+
 
 /**
  * <p>Java class для описания структуры формы данных. 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "dataform", propOrder = {
+//@formatter:off
     "documentation",
     "parameters",
-    "operators",
+    "operations",
     "columns",
     "fields"
+//@formatter:on
 })
 @XmlRootElement(name = "dataform", namespace="http://www.q4s.org/dafobi/dataform")
 public class Dataform {
 
+	/** 
+	 * Человекоориентированное документирование формы. 
+	 */
+    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
     protected Documentation documentation;
     
-    protected Operators operators;
+    /**
+     * Операции, которые могут делаться с формой. 
+     */
+    protected Operations operations;
     
+    /**
+     * Параметры, которые ожидает форма для своей работы.
+     */
     @XmlElementWrapper
     @XmlElement(name = "parameter", namespace = "http://www.q4s.org/dafobi/dataform")
     protected List<Parameter> parameters;
     
+    /**
+     * Колонки, содержащиеся в таблице данных формы.
+     */
     @XmlElementWrapper
     @XmlElement(name = "column", namespace = "http://www.q4s.org/dafobi/dataform")
     protected List<Column> columns;
     
+    /**
+     * Поля, определенные для формы.
+     */
     @XmlElementWrapper
     @XmlElement(name = "field", namespace = "http://www.q4s.org/dafobi/dataform")
     protected List<Field> fields;
     
+    /**
+     * Символьный код формы
+     */
     @XmlAttribute(name = "code", required = true)
     protected String code;
     
-    @XmlAttribute(name = "target")
-    protected String target;
-    
-    @XmlAttribute(name = "type")
-    protected String type;
-    
-    @XmlAttribute(name = "pane")
-    protected String pane;
-    
-    @XmlAttribute(name = "parent")
-    protected String parent;
+//    @XmlAttribute(name = "target")
+//    protected String target;
+//    
+//    @XmlAttribute(name = "type")
+//    protected String type;
+//    
+//    @XmlAttribute(name = "parent")
+//    protected String parent;
 
     /**
      * Gets the value of the documentation property.
@@ -80,11 +100,11 @@ public class Dataform {
      * 
      * @return
      *     possible object is
-     *     {@link Operators }
+     *     {@link Operations }
      *     
      */
-    public Operators getOperators() {
-        return operators;
+    public Operations getOperations() {
+        return operations;
     }
 
     /**
@@ -92,11 +112,11 @@ public class Dataform {
      * 
      * @param value
      *     allowed object is
-     *     {@link Operators }
+     *     {@link Operations }
      *     
      */
-    public void setOperators(Operators value) {
-        this.operators = value;
+    public void setOperations(Operations value) {
+        this.operations = value;
     }
 
     /**
@@ -123,101 +143,77 @@ public class Dataform {
         this.code = value;
     }
 
-    /**
-     * Gets the value of the target property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTarget() {
-        return target;
-    }
-
-    /**
-     * Sets the value of the target property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTarget(String value) {
-        this.target = value;
-    }
-
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
-
-    /**
-     * Gets the value of the pane property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPane() {
-        return pane;
-    }
-
-    /**
-     * Sets the value of the pane property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPane(String value) {
-        this.pane = value;
-    }
-
-    /**
-     * Gets the value of the parent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getParent() {
-        return parent;
-    }
-
-    /**
-     * Sets the value of the parent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setParent(String value) {
-        this.parent = value;
-    }
+//    /**
+//     * Gets the value of the target property.
+//     * 
+//     * @return
+//     *     possible object is
+//     *     {@link String }
+//     *     
+//     */
+//    public String getTarget() {
+//        return target;
+//    }
+//
+//    /**
+//     * Sets the value of the target property.
+//     * 
+//     * @param value
+//     *     allowed object is
+//     *     {@link String }
+//     *     
+//     */
+//    public void setTarget(String value) {
+//        this.target = value;
+//    }
+//
+//    /**
+//     * Gets the value of the type property.
+//     * 
+//     * @return
+//     *     possible object is
+//     *     {@link String }
+//     *     
+//     */
+//    public String getType() {
+//        return type;
+//    }
+//
+//    /**
+//     * Sets the value of the type property.
+//     * 
+//     * @param value
+//     *     allowed object is
+//     *     {@link String }
+//     *     
+//     */
+//    public void setType(String value) {
+//        this.type = value;
+//    }
+//
+//    /**
+//     * Gets the value of the parent property.
+//     * 
+//     * @return
+//     *     possible object is
+//     *     {@link String }
+//     *     
+//     */
+//    public String getParent() {
+//        return parent;
+//    }
+//
+//    /**
+//     * Sets the value of the parent property.
+//     * 
+//     * @param value
+//     *     allowed object is
+//     *     {@link String }
+//     *     
+//     */
+//    public void setParent(String value) {
+//        this.parent = value;
+//    }
 
     public List<Parameter> getParameters() {
         if (parameters == null) {

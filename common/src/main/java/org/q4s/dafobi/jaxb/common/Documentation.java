@@ -1,5 +1,5 @@
 
-package org.q4s.dafobi.jaxb.dataform;
+package org.q4s.dafobi.jaxb.common;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
