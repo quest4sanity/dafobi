@@ -26,7 +26,7 @@ import org.q4s.dafobi.jaxb.common.Documentation;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Tabindex_QNAME = new QName("http://www.q4s.org/dafobi/dataform", "tabindex");
+    private final static QName _Tabindex_QNAME = new QName("urn:q4s:dafobi:dataform", "tabindex");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.borlas.bus.kernel.intro.form
@@ -111,7 +111,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.q4s.org/dafobi/dataform", name = "tabindex")
+    @XmlElementDecl(namespace = "urn:q4s:dafobi:dataform", name = "tabindex")
     public JAXBElement<Integer> createTabindex(Integer value) {
         return new JAXBElement<Integer>(_Tabindex_QNAME, Integer.class, null, value);
     }

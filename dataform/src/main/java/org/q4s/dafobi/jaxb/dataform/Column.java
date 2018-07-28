@@ -29,7 +29,7 @@ public class Column {
 
 	protected String group;
 
-    @XmlElement(name = "datatype", namespace = "http://www.q4s.org/dafobi/trans", required = true)
+    @XmlElement(name = "datatype", namespace = "urn:q4s:dafobi:trans", required = true)
 	protected DataType datatype;
 
 	protected String alias;

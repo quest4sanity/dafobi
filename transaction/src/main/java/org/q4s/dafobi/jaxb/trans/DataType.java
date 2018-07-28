@@ -38,7 +38,7 @@ import org.q4s.dafobi.trans.ITransaction;
  * @author Q4S
  * 
  */
-@XmlType(namespace = "http://www.q4s.org/dafobi/trans", name = "dataType")
+@XmlType(namespace = "urn:q4s:dafobi:trans", name = "dataType")
 @XmlEnum
 public enum DataType {
 

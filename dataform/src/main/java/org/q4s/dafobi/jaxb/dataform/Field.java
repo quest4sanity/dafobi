@@ -31,7 +31,7 @@ import org.q4s.dafobi.jaxb.common.Documentation;
 @XmlRootElement(name = "field")
 public class Field {
 
-    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
+    @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common", required = true)
 	protected Documentation documentation;
 
 	protected int tabindex;
@@ -40,11 +40,11 @@ public class Field {
 	protected String fieldtype;
 
 	@XmlElementWrapper
-	@XmlElement(name = "parameter", namespace = "http://www.q4s.org/dafobi/dataform")
+	@XmlElement(name = "parameter", namespace = "urn:q4s:dafobi:dataform")
 	protected List<Field.Parameter> parameters;
 
 	@XmlElementWrapper
-	@XmlElement(name = "column", namespace = "http://www.q4s.org/dafobi/dataform")
+	@XmlElement(name = "column", namespace = "urn:q4s:dafobi:dataform")
 	protected List<Field.Column> columns;
 
 	protected FieldState state;

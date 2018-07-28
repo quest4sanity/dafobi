@@ -21,13 +21,13 @@ import org.q4s.dafobi.jaxb.common.Documentation;
     "fields"
 //@formatter:on
 })
-@XmlRootElement(name = "dataform", namespace="http://www.q4s.org/dafobi/dataform")
+@XmlRootElement(name = "dataform", namespace="urn:q4s:dafobi:dataform")
 public class Dataform {
 
 	/** 
 	 * Человекоориентированное документирование формы. 
 	 */
-    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
+    @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common", required = true)
     protected Documentation documentation;
     
     /**
@@ -39,21 +39,21 @@ public class Dataform {
      * Параметры, которые ожидает форма для своей работы.
      */
     @XmlElementWrapper
-    @XmlElement(name = "parameter", namespace = "http://www.q4s.org/dafobi/dataform")
+    @XmlElement(name = "parameter", namespace = "urn:q4s:dafobi:dataform")
     protected List<Parameter> parameters;
     
     /**
      * Колонки, содержащиеся в таблице данных формы.
      */
     @XmlElementWrapper
-    @XmlElement(name = "column", namespace = "http://www.q4s.org/dafobi/dataform")
+    @XmlElement(name = "column", namespace = "urn:q4s:dafobi:dataform")
     protected List<Column> columns;
     
     /**
      * Поля, определенные для формы.
      */
     @XmlElementWrapper
-    @XmlElement(name = "field", namespace = "http://www.q4s.org/dafobi/dataform")
+    @XmlElement(name = "field", namespace = "urn:q4s:dafobi:dataform")
     protected List<Field> fields;
     
     /**

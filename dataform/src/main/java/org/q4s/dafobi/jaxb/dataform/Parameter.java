@@ -27,10 +27,10 @@ import org.q4s.dafobi.jaxb.trans.DataType;
 @XmlRootElement(name = "parameter")
 public class Parameter {
 
-    @XmlElement(name = "documentation", namespace = "http://www.q4s.org/dafobi/common", required = true)
+    @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common", required = true)
 	protected Documentation documentation;
 
-    @XmlElement(name = "datatype", namespace = "http://www.q4s.org/dafobi/trans", required = true)
+    @XmlElement(name = "datatype", namespace = "urn:q4s:dafobi:trans", required = true)
 	protected DataType datatype;
 
 	protected Boolean required;

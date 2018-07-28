@@ -91,6 +91,9 @@
 					<include>**/*.properties</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>${basedir}/src/main/jaxb</directory>
+			</resource>
 		</resources>
 
 		<testResources>
@@ -126,17 +129,17 @@
 					</sources>
 					<transformSchemas>
 						<transformSchema>
-							<uri>http://www.q4s.org/dafobi/common</uri>
+							<uri>urn:q4s:dafobi:common</uri>
 							<toPrefix>c</toPrefix>
 							<toFile>common.xsd</toFile>
 						</transformSchema>
 						<transformSchema>
-							<uri>http://www.q4s.org/dafobi/trans</uri>
+							<uri>urn:q4s:dafobi:trans</uri>
 							<toPrefix>t</toPrefix>
 							<toFile>trans.xsd</toFile>
 						</transformSchema>
 						<transformSchema>
-							<uri>http://www.q4s.org/dafobi/dataform</uri>
+							<uri>urn:q4s:dafobi:dataform</uri>
 							<toPrefix>d</toPrefix>
 							<toFile>dataform.xsd</toFile>
 						</transformSchema>

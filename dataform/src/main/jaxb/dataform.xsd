@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="http://www.q4s.org/dafobi/common" xmlns:d="http://www.q4s.org/dafobi/dataform" xmlns:t="http://www.q4s.org/dafobi/trans" elementFormDefault="qualified" targetNamespace="http://www.q4s.org/dafobi/dataform" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="urn:q4s:dafobi:common" xmlns:d="urn:q4s:dafobi:dataform" xmlns:t="urn:q4s:dafobi:trans" elementFormDefault="qualified" targetNamespace="urn:q4s:dafobi:dataform" version="1.0">
 
-  <xs:import namespace="http://www.q4s.org/dafobi/trans" schemaLocation="trans.xsd"/>
+  <xs:import namespace="urn:q4s:dafobi:trans" schemaLocation="trans.xsd"/>
 
-  <xs:import namespace="http://www.q4s.org/dafobi/common" schemaLocation="common.xsd"/>
+  <xs:import namespace="urn:q4s:dafobi:common" schemaLocation="common.xsd"/>
 
   <xs:element name="column">
     <xs:complexType>
