@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<d:dataform xmlns:d="urn:q4s:dafobi:dataform" xmlns:c="urn:q4s:dafobi:common"
+	xmlns:t="urn:q4s:dafobi:trans" xmlns="urn:q4s:dafobi:dataform" code="DOC_BNRG_BROWSE/MAIN/DW1">
+
+	<c:documentation>
+		<c:title>Поиск Банковских выписок по шапкам</c:title>
+		<c:description>Поиск Банковских выписок по информации,
+			содержащейся в
+			шапке документа.
+		</c:description>
+	</c:documentation>
+
+	<!-- Аргументы, которыми при загрузке данных могут пользоваться операторы 
+		по работе с базой данных. 
+	<d:parameters>
+	</d:parameters> -->
+
+	<!-- Операторы по работе с базой данных (много вариантов). -->
+	<d:operations type="jdbc">
+		<select>
+<![CDATA[
+  SELECT /*+INDEX(documents doc_pk)*/ 
+         "ACPDBA"."BANK_REGISTERS"."DOC_ID",   
+         "ACPDBA"."BANK_REGISTERS"."DOC_NUMBER",   
+         "ACPDBA"."BANK_REGISTERS"."DOC_DATE",   
+         "ACPDBA"."BANK_REGISTERS"."AMOUNT_START",   
+         "ACPDBA"."BANK_REGISTERS"."AMOUNT_END",   
+         decode(ACPDBA."CONTR_BANKS"."NOTE", null, '', ACPDBA."CONTR_BANKS"."NOTE" || ' ')  || "ACPDBA"."CONTR_BANKS"."ACCOUNT" || '::' || ACPDBA.PCK_REFS.CONTR_NAME("ACPDBA"."CONTR_BANKS".CNT_ID,"ACPDBA"."BANK_REGISTERS"."DOC_DATE",5)   as account,   
+         "ACPDBA"."BANK_REGISTERS"."NOTE",  
+		 (c.crn_id) as crn_id, 
+		 (c.char_code) as crn_name 
+    FROM "ACPDBA"."BANK_REGISTERS",   
+         "ACPDBA"."CONTR_BANKS", 
+		 "ACPDBA"."CURRENCIES" c 
+   WHERE ( "ACPDBA"."CONTR_BANKS"."BANK_ID" = "ACPDBA"."BANK_REGISTERS"."BANK_ID" )  
+	 AND ( ACPDBA.BANK_REGISTERS.crn_id = c.crn_id )  
+
+ORDER BY "ACPDBA"."BANK_REGISTERS"."DOC_DATE" DESC,   
+         "ACPDBA"."BANK_REGISTERS"."DOC_NUMBER" ASC   
+]]>
+		</select>
+	</d:operations>
+
+	<!-- Определение колонок для таблицы. -->
+	<d:columns>
+		<d:column code="doc_id">
+			<d:group>KEY</d:group>
+			<d:datatype>NUMBER</d:datatype>
+			<d:alias>doc_id</d:alias>
+		</d:column>
+		<d:column code="doc_number">
+			<d:datatype>STRING</d:datatype>
+			<d:alias>doc_number</d:alias>
+		</d:column>
+		<d:column code="doc_date">
+			<d:datatype>DATETIME</d:datatype>
+			<d:alias>doc_date</d:alias>
+		</d:column>
+		<d:column code="amount_start">
+			<d:datatype>NUMBER</d:datatype>
+			<d:alias>amount_start</d:alias>
+		</d:column>
+		<d:column code="amount_end">
+			<d:datatype>NUMBER</d:datatype>
+			<d:alias>amount_end</d:alias>
+		</d:column>
+		<d:column code="account">
+			<d:datatype>STRING</d:datatype>
+			<d:alias>account</d:alias>
+		</d:column>
+		<d:column code="note">
+			<d:datatype>STRING</d:datatype>
+			<d:alias>note</d:alias>
+		</d:column>
+		<d:column code="crn_id">
+			<d:datatype>NUMBER</d:datatype>
+			<d:alias>crn_id</d:alias>
+		</d:column>
+		<d:column code="crn_name">
+			<d:datatype>STRING</d:datatype>
+			<d:alias>crn_name</d:alias>
+		</d:column>
+	</d:columns>
+
+	<!-- Определение полей DataStore -->
+	<d:fields>
+		<d:field code="doc_number">
+			<c:documentation>
+				<c:title>Номер выписки</c:title>
+				<c:description>Номер банковской выписки</c:description>
+			</c:documentation>
+			<d:tabindex>10</d:tabindex>
+			<d:fieldtype>STRING</d:fieldtype>
+			<d:columns>
+				<d:column ref="doc_number" />
+			</d:columns>
+		</d:field>
+		<d:field code="doc_date">
+			<c:documentation>
+				<c:title>Дата</c:title>
+				<c:description>Дата банковской выписки</c:description>
+			</c:documentation>
+			<d:tabindex>20</d:tabindex>
+			<d:fieldtype>DATE</d:fieldtype>
+			<d:columns>
+				<d:column ref="doc_date" />
+			</d:columns>
+		</d:field>
+		<d:field code="amount_start">
+			<c:documentation>
+				<c:title>Сальдо на начало дня</c:title>
+				<c:description></c:description>
+			</c:documentation>
+			<d:tabindex>30</d:tabindex>
+			<d:fieldtype>NUMBER</d:fieldtype>
+			<d:columns>
+				<d:column ref="amount_start" />
+			</d:columns>
+		</d:field>
+		<d:field code="amount_end">
+			<c:documentation>
+				<c:title>Сальдо на конец дня</c:title>
+				<c:description></c:description>
+			</c:documentation>
+			<d:tabindex>40</d:tabindex>
+			<d:fieldtype>NUMBER</d:fieldtype>
+			<d:columns>
+				<d:column ref="amount_end" />
+			</d:columns>
+		</d:field>
+		<d:field code="crn">
+			<c:documentation>
+				<c:title>Валюта</c:title>
+				<c:description></c:description>
+			</c:documentation>
+			<d:tabindex>50</d:tabindex>
+			<d:fieldtype>CURRENCY</d:fieldtype>
+			<d:columns>
+				<d:column ref="crn_name" />
+				<d:column ref="crn_id" />
+			</d:columns>
+		</d:field>
+		<d:field code="account">
+			<c:documentation>
+				<c:title>Счет</c:title>
+				<c:description>Расчетный счет</c:description>
+			</c:documentation>
+			<d:tabindex>60</d:tabindex>
+			<d:fieldtype>STRING</d:fieldtype>
+			<d:columns>
+				<d:column ref="account" />
+			</d:columns>
+		</d:field>
+		<d:field code="note">
+			<c:documentation>
+				<c:title>Примечание</c:title>
+				<c:description></c:description>
+			</c:documentation>
+			<d:tabindex>70</d:tabindex>
+			<d:fieldtype>STRING</d:fieldtype>
+			<d:columns>
+				<d:column ref="note" />
+			</d:columns>
+		</d:field>
+	</d:fields>
+
+</d:dataform>
+

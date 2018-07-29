@@ -3,6 +3,7 @@ package org.q4s.dafobi.jaxb.dataform;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -32,6 +33,13 @@ public class Operations {
 
 	protected String preselect;
 
+	/**
+	 * Операции могут быть реализованы на разных движках. Здесь задается, для
+	 * какого именно движка указываются операции.
+	 */
+	@XmlAttribute(name = "type", required = true)
+	protected String type;
+
 	@XmlElement(required = true)
 	protected String select;
 
@@ -50,6 +58,14 @@ public class Operations {
 	protected String deleterow;
 
 	protected String postsave;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	/**
 	 * Gets the value of the preselect property.

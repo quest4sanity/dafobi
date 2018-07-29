@@ -30,7 +30,7 @@ public class Parameter {
     @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common", required = true)
 	protected Documentation documentation;
 
-    @XmlElement(name = "datatype", namespace = "urn:q4s:dafobi:trans", required = true)
+    @XmlElement(name = "datatype", required = true)
 	protected DataType datatype;
 
 	protected Boolean required;

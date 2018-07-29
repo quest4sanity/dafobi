@@ -22,9 +22,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "documentation")
 public class Documentation {
 
+	/**
+	 * Заголовок, описывающий предназначение элемента
+	 */
 	@XmlElement(required = true)
 	protected String title;
 
+	/**
+	 * Подробное описание элемента. 
+	 */
 	protected String description;
 
 	/**

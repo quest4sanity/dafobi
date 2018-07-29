@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="urn:q4s:dafobi:trans" targetNamespace="urn:q4s:dafobi:trans" version="1.0">
-
-  <xs:element name="datatype" type="t:dataType"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:q4s:dafobi:trans" version="1.0">
 
   <xs:simpleType name="dataType">
     <xs:annotation>

@@ -21,13 +21,29 @@ import org.q4s.dafobi.jaxb.common.Documentation;
     "fields"
 //@formatter:on
 })
-@XmlRootElement(name = "dataform", namespace="urn:q4s:dafobi:dataform")
+@XmlRootElement
+//@XmlRootElement(name = "dataform", namespace="urn:q4s:dafobi:dataform")
 public class Dataform {
+    
+    /**
+     * Символьный код формы
+     */
+    @XmlAttribute(name = "code", required = true)
+    protected String code;
+    
+//    @XmlAttribute(name = "target")
+//    protected String target;
+//    
+//    @XmlAttribute(name = "type")
+//    protected String type;
+//    
+//    @XmlAttribute(name = "parent")
+//    protected String parent;
 
 	/** 
 	 * Человекоориентированное документирование формы. 
 	 */
-    @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common", required = true)
+    @XmlElement(name = "documentation", namespace = "urn:q4s:dafobi:common")
     protected Documentation documentation;
     
     /**
@@ -46,7 +62,7 @@ public class Dataform {
      * Колонки, содержащиеся в таблице данных формы.
      */
     @XmlElementWrapper
-    @XmlElement(name = "column", namespace = "urn:q4s:dafobi:dataform")
+    @XmlElement(name = "column", namespace = "urn:q4s:dafobi:dataform", required = true)
     protected List<Column> columns;
     
     /**
@@ -55,21 +71,6 @@ public class Dataform {
     @XmlElementWrapper
     @XmlElement(name = "field", namespace = "urn:q4s:dafobi:dataform")
     protected List<Field> fields;
-    
-    /**
-     * Символьный код формы
-     */
-    @XmlAttribute(name = "code", required = true)
-    protected String code;
-    
-//    @XmlAttribute(name = "target")
-//    protected String target;
-//    
-//    @XmlAttribute(name = "type")
-//    protected String type;
-//    
-//    @XmlAttribute(name = "parent")
-//    protected String parent;
 
     /**
      * Gets the value of the documentation property.
