@@ -21,6 +21,8 @@
 		<module>common</module>
 		<module>transaction</module>
 		<module>dataform</module>
+		<module>variables</module>
+		<module>dfbfaces</module>
 	</modules>
 
 	<scm>

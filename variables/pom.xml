@@ -2,16 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.q4s.dafobi</groupId>
-	<artifactId>dataform</artifactId>
-
+	<artifactId>variables</artifactId>
 	<parent>
 		<groupId>org.q4s</groupId>
 		<artifactId>dafobi</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>Реализация функционала форм данных</name>
-	<description>Модуль работы с локальными хранилищами данных и формами данных.</description>
+	<name>Реализация функционала переменных</name>
+	<description>Средство, обеспечивающее работу с контейнерами переменных. Контейнер может быть как простым хранилищем, так и вычислимым выражением. В случае применения вычислимых выражений открывается возможность передавать значения по ссылке. </description>
 
 	<licenses>
 		<license>
@@ -28,23 +27,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.q4s.dafobi</groupId>
-			<artifactId>transaction</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.q4s.dafobi</groupId>
-			<artifactId>variables</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>jasper-el</artifactId>
+			<version>6.0.53</version>
 		</dependency>
 
 		<dependency>
@@ -58,13 +55,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -73,12 +63,6 @@
 		<dependency>
 			<groupId>org.dbunit</groupId>
 			<artifactId>dbunit</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -108,9 +92,6 @@
 					<include>**/*.properties</include>
 				</includes>
 			</resource>
-			<resource>
-				<directory>${basedir}/src/main/jaxb</directory>
-			</resource>
 		</resources>
 
 		<testResources>
@@ -132,37 +113,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<configuration>
-					<episodeFileName>dataform</episodeFileName>
-					<sources>
-						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb</source>
-						<source>${basedir}/../common/src/main/java/org/q4s/dafobi/jaxb/common</source>
-						<source>${basedir}/../transaction/src/main/java/org/q4s/dafobi/jaxb/trans</source>
-					</sources>
-					<transformSchemas>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:common</uri>
-							<toPrefix>c</toPrefix>
-							<toFile>common.xsd</toFile>
-						</transformSchema>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:trans</uri>
-							<toPrefix>t</toPrefix>
-							<toFile>trans.xsd</toFile>
-						</transformSchema>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:dataform</uri>
-							<toPrefix>d</toPrefix>
-							<toFile>dataform.xsd</toFile>
-						</transformSchema>
-					</transformSchemas>
-					<!-- <xsdPathWithinArtifact>generated/xsd</xsdPathWithinArtifact> -->
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
