@@ -20,6 +20,7 @@ package org.q4s.dafobi.trans;
 
 import java.util.Map;
 
+import org.q4s.dafobi.common.DataParam;
 import org.q4s.dafobi.exception.TransactionException;
 
 public interface ITransaction extends AutoCloseable {

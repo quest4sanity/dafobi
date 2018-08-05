@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import org.q4s.dafobi.trans.IRow;
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 import org.q4s.dafobi.trans.AbstractResultTable;
 import org.q4s.dafobi.trans.IStatement;
 import org.q4s.dafobi.trans.RowImpl;

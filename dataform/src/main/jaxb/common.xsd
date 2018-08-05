@@ -9,4 +9,23 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+
+  <xs:simpleType name="dataType">
+    <xs:annotation>
+      <xs:documentation><![CDATA[Типы данных, с которыми умеет работать система, а так же ряда методов для
+конвертации их в класс, символьные значения и пр.
+
+(author): Q4S]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="LONGSTRING"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="LONG"/>
+      <xs:enumeration value="NUMBER"/>
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="TIME"/>
+      <xs:enumeration value="DATETIME"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>

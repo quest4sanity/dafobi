@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
  * <p>

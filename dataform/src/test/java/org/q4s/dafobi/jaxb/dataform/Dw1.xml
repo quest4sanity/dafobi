@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <d:dataform xmlns:d="urn:q4s:dafobi:dataform" xmlns:c="urn:q4s:dafobi:common"
-	xmlns:t="urn:q4s:dafobi:trans" xmlns="urn:q4s:dafobi:dataform" code="DOC_BNRG_BROWSE/MAIN/DW1">
+	xmlns="urn:q4s:dafobi:dataform" code="DOC_BNRG_BROWSE/MAIN/DW1">
 
 	<c:documentation>
 		<c:title>Поиск Банковских выписок по шапкам</c:title>

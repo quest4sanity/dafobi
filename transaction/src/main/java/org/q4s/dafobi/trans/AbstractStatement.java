@@ -22,7 +22,8 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.common.DataParam;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
  * Класс, реализующий базовый скелет для запросов.

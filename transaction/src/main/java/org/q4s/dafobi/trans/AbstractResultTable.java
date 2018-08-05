@@ -22,7 +22,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
  * Класс описывает метаинформацию заголовка таблицы данных. Сюда входят: имена

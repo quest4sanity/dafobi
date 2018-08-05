@@ -37,10 +37,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.q4s.dafobi.common.DataParam;
 import org.q4s.dafobi.exception.TransactionException;
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 import org.q4s.dafobi.trans.AbstractStatement;
-import org.q4s.dafobi.trans.DataParam;
 import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IStatement;
 

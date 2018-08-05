@@ -141,19 +141,13 @@
 					<episodeFileName>dataform</episodeFileName>
 					<sources>
 						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb</source>
-						<source>${basedir}/../common/src/main/java/org/q4s/dafobi/jaxb/common</source>
-						<source>${basedir}/../transaction/src/main/java/org/q4s/dafobi/jaxb/trans</source>
+						<source>${basedir}/../common/src/main/java/org/q4s/dafobi/jaxb</source>
 					</sources>
 					<transformSchemas>
 						<transformSchema>
 							<uri>urn:q4s:dafobi:common</uri>
 							<toPrefix>c</toPrefix>
 							<toFile>common.xsd</toFile>
-						</transformSchema>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:trans</uri>
-							<toPrefix>t</toPrefix>
-							<toFile>trans.xsd</toFile>
 						</transformSchema>
 						<transformSchema>
 							<uri>urn:q4s:dafobi:dataform</uri>

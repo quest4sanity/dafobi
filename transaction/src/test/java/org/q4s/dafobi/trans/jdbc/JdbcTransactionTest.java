@@ -36,8 +36,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.q4s.dafobi.jaxb.trans.DataType;
-import org.q4s.dafobi.trans.DataParam;
+import org.q4s.dafobi.common.DataParam;
+import org.q4s.dafobi.jaxb.common.DataType;
 import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IRow;
 

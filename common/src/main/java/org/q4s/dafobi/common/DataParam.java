@@ -16,15 +16,14 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.trans;
+package org.q4s.dafobi.common;
 
 import java.text.MessageFormat;
 
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
- * Данный класс связывает воедино значение и его тип данных {@link DataType}. В
- * таком виде значение используется в методах {@link IStatement}.
+ * Данный класс связывает воедино значение и его тип данных {@link DataType}. 
  * <p>
  * Для получения объекта данного типа проще всего воспользоваться типом данных
  * {@link DataType}. Например так:

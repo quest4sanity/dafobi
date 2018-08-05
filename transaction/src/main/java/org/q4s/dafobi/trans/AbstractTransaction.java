@@ -21,6 +21,8 @@ package org.q4s.dafobi.trans;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.q4s.dafobi.common.DataParam;
+
 /**
  * Данный класс реализует общую часть функционала, которую должна реализовывать
  * транзакция.

@@ -16,7 +16,7 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.trans;
+package org.q4s.dafobi.common;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +29,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.common.DataParam;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 public class DataTypeTest {
 

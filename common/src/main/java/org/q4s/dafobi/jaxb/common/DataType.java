@@ -16,7 +16,7 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.jaxb.trans;
+package org.q4s.dafobi.jaxb.common;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -27,9 +27,9 @@ import java.text.MessageFormat;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-import org.q4s.dafobi.trans.DataParam;
-import org.q4s.dafobi.trans.IStatement;
-import org.q4s.dafobi.trans.ITransaction;
+import org.q4s.dafobi.common.DataParam;
+//import org.q4s.dafobi.trans.IStatement;
+//import org.q4s.dafobi.trans.ITransaction;
 
 /**
  * Типы данных, с которыми умеет работать система, а так же ряда методов для

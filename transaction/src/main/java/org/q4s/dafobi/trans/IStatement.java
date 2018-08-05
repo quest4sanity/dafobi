@@ -21,8 +21,9 @@ package org.q4s.dafobi.trans;
 import java.sql.Statement;
 import java.util.Map;
 
+import org.q4s.dafobi.common.DataParam;
 import org.q4s.dafobi.exception.TransactionException;
-import org.q4s.dafobi.jaxb.trans.DataType;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
  * Оператор, получающий строки данных из базы или любого другого хранилища.
