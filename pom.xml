@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>Проект построителя форм</name>
-	<description>Инструмент графического построения форм, работающих с данными, находящимися в базе данных или в любом другом внешнем хранилище.</description>
+	<description>Инструмент быстрого интерактивного построения форм, работающих с данными, находящимися в базе данных или в любом другом внешнем хранилище.</description>
 
 	<licenses>
 		<license>
@@ -59,6 +59,24 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.q4s.dafobi</groupId>
+				<artifactId>variables</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.q4s.dafobi</groupId>
+				<artifactId>dataform</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.q4s.dafobi</groupId>
+				<artifactId>dfbfaces</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>1.3.2</version>
@@ -80,6 +98,12 @@
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
 				<version>2.2.11</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.atteo.classindex</groupId>
+				<artifactId>classindex</artifactId>
+				<version>3.4</version>
 			</dependency>
 
 			<dependency>
@@ -120,6 +144,37 @@
 	</dependencyManagement>
 
 	<build>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+		<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.sql</include>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/java</directory>
+				<includes>
+					<include>**/*.sql</include>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+				<includes>
+					<include>**/*.sql</include>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+		</testResources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -197,9 +252,35 @@
 						<createJavaDocAnnotations>true</createJavaDocAnnotations>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.1.1</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+							<configuration>
+								<transformers>
+									<transformer implementation="org.atteo.classindex.ClassIndexTransformer" />
+								</transformers>
+							</configuration>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.atteo.classindex</groupId>
+							<artifactId>classindex-transformer</artifactId>
+							<version>3.4</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 			</plugins>
 		</pluginManagement>
-		
+
 		<extensions>
 			<!-- Enabling the use of FTP -->
 			<extension>

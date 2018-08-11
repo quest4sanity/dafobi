@@ -4,22 +4,22 @@
 	<groupId>org.q4s.dafobi</groupId>
 	<artifactId>common</artifactId>
 
-	<name>Общий функционал</name>
-	<description>Разнообразный функционал, который, с одной стороны, совершенно автономен, а с другой, может понадобиться в любом из модулей проекта. </description>
-
-    <licenses>
-        <license>
-            <name>LGPL-3</name>
-            <url>https://www.gnu.org/licenses/lgpl.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
 	<parent>
 		<groupId>org.q4s</groupId>
 		<artifactId>dafobi</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+
+	<name>Общий функционал</name>
+	<description>Разнообразный функционал, который, с одной стороны, совершенно автономен, а с другой, может понадобиться в любом из модулей проекта. </description>
+
+	<licenses>
+		<license>
+			<name>LGPL-3</name>
+			<url>https://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<dependency>
@@ -42,30 +42,6 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-		<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
-
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.sql</include>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/resources</directory>
-				<includes>
-					<include>**/*.sql</include>
-					<include>**/*.properties</include>
-				</includes>
-			</testResource>
-		</testResources>
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
