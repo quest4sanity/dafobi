@@ -18,39 +18,137 @@
  */
 package org.q4s.dafobi.variables;
 
-import java.io.Serializable;
+import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
- * <p>
- * Данный класс является основой для всех переменных, изменение которых
- * необходимо своевременно отслеживать. С помощью данного класса можно
- * организовать каскадный перерасчет вычислимых выражений.
- * </p>
+ * Обычная переменная, изменение значения которой может потребоваться
+ * отслеживать.
  * 
  * @author Q4S
  * 
  */
-public abstract class Var implements Serializable, IVar {
+public class Var extends AbstractVar {
 
 	private static final long serialVersionUID = 1L;
 
+	private boolean readOnly = false;
+
 	/**
-	 * 
+	 * Значение переменной.
+	 */
+	private Object value;
+
+	/**
+	 * @see Var
 	 */
 	public Var() {
+		this(null, null);
 	}
 
 	/**
-	 * Функция вовзвращает true, если строковое выражение имеет признаки
-	 * EL-выражения. Или, говоря иначе, если в строке вычислимое выражение, а не
-	 * константа.
+	 * @param value
+	 *            Начальное значение переменной.
 	 * 
-	 * @param text
-	 *            Текстовое выражение (константа или EL-формула).
-	 * 
-	 * @return <b>true</b> - если в тексте EL-выражение.
+	 * @see Var
 	 */
-	public static boolean isElExpression(final String text) {
-		return text.contains("#" + "{") || text.contains("$" + "{");
+	public Var(Object value) {
+		this(value, null);
+	}
+
+	/**
+	 * @param value
+	 *            Начальное значение переменной.
+	 * 
+	 * @param valueClass
+	 *            Класс, к которому надо приводить значение переменной.
+	 * 
+	 * @see Var
+	 */
+	public Var(Object value, DataType type) {
+		super();
+
+		setType(type);
+		set(value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#isReadOnly()
+	 */
+	@Override
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	/**
+	 * Метод позволяет защитить значение переменной от изменений, фактически
+	 * сделав его константой (вплоть до отмены защиты).
+	 * 
+	 * @param readOnly
+	 *            при значении true изменить значение станет невозможно.
+	 */
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#get()
+	 */
+	@Override
+	public Object get() {
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#set(java.lang.Object)
+	 */
+	@Override
+	public void set(final Object value) {
+		if (readOnly) {
+			return;
+
+		} else if (value == null) {
+			this.value = null;
+
+		} else {
+			this.value = convert(value);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#isReadOnly(org.q4s.dafobi.variables.
+	 * IContext)
+	 */
+	@Override
+	public final boolean isReadOnly(IContext context) {
+		return isReadOnly();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#get(org.q4s.dafobi.variables.IContext)
+	 */
+	@Override
+	public final Object get(IContext context) {
+		return get();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.q4s.dafobi.variables.IVar#set(org.q4s.dafobi.variables.IContext,
+	 * java.lang.Object)
+	 */
+	@Override
+	public final void set(IContext context, Object value) {
+		set(value);
 	}
 }

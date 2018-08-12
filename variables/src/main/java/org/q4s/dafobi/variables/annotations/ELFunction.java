@@ -16,21 +16,31 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.variables;
+package org.q4s.dafobi.variables.annotations;
 
-import org.q4s.dafobi.variables.context.Context;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <p>
- * Интерфейс используется как техническое решение для раздения вычислимых
- * выражений и контейнера общего вида (например, простого контейнера для
- * переменной {@link Var}). В качестве контекста для вычислимых выражениях
- * всегда используется другой отнаследованый от {@link Context} класс,
- * имплементирующий данный интерфейс.
+ * Данная аннотакция помечает метод в качесте функции, которую можно
+ * использовать в вычислимых выражениях.
  * </p>
  * 
- * @author Q4S
- *
+ * @author vbogdanov
+ * 
  */
-public interface IContext {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Documented
+@Inherited
+public @interface ELFunction {
+	/**
+	 * @return Симв. код параметра (имя праметра).
+	 */
+	String name();
 }

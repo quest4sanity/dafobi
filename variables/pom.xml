@@ -11,7 +11,7 @@
 	</parent>
 
 	<name>Реализация функционала переменных</name>
-	<description>Средство, обеспечивающее работу с контейнерами переменных. Контейнер может быть как простым хранилищем, так и вычислимым выражением. В случае применения вычислимых выражений открывается возможность передавать значения по ссылке. </description>
+	<description>Средство, обеспечивающее работу с контейнерами переменных. Контейнер может быть как простым хранилищем одной переменной, так и вычислимым выражением. В случае применения вычислимых выражений открывается возможность передавать значения по ссылке.</description>
 
 	<licenses>
 		<license>
@@ -43,6 +43,8 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>jasper-el</artifactId>
 			<version>6.0.53</version>
+			<!-- <groupId>org.apache.geronimo.ext.tomcat</groupId> <artifactId>jasper-el</artifactId> 
+				<version>7.0.39.2</version> -->
 		</dependency>
 
 		<dependency>
@@ -95,11 +97,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

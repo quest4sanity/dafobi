@@ -16,7 +16,7 @@
  *
  * @author Vladimir Bogdanov - quest4sanity@gmail.com
  */
-package org.q4s.dafobi.variables.data;
+package org.q4s.dafobi.variables;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,8 +31,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.q4s.dafobi.jaxb.common.DataType;
 import org.q4s.dafobi.variables.IVar;
+import org.q4s.dafobi.variables.Var;
 
-public class VarDataTest {
+public class VarTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -51,31 +52,31 @@ public class VarDataTest {
 	}
 
 	/**
-	 * @see VarData#VarData()
+	 * @see Var#VarData()
 	 */
 	@Test
 	public void testVarData() {
-		IVar var = new VarData();
+		IVar var = new Var();
 		assertNull(var.get());
 		assertNull(var.getType());
 	}
 
 	/**
-	 * @see VarData#VarData(Object)
+	 * @see Var#VarData(Object)
 	 */
 	@Test
 	public void testVarDataObject() {
-		IVar var = new VarData("Test");
+		IVar var = new Var("Test");
 		assertEquals("Test", var.get());
 		assertNull(var.getType());
 	}
 
 	/**
-	 * @see VarData#VarData(Object, DataType)
+	 * @see Var#VarData(Object, DataType)
 	 */
 	@Test
 	public void testVarDataObjectDataType() {
-		IVar var = new VarData("123.3", DataType.NUMBER);
+		IVar var = new Var("123.3", DataType.NUMBER);
 		assertEquals(new BigDecimal("123.3"), var.get());
 		assertEquals(DataType.NUMBER, var.getType());
 	}
@@ -83,13 +84,13 @@ public class VarDataTest {
 	/**
 	 * Проверка установки нового значения.
 	 * 
-	 * @see VarData#get()
-	 * @see VarData#set(Object)
-	 * @see VarData#setType(DataType)
+	 * @see Var#get()
+	 * @see Var#set(Object)
+	 * @see Var#setType(DataType)
 	 */
 	@Test
 	public void testGetSet() {
-		IVar var = new VarData();
+		IVar var = new Var();
 
 		var.set("123.3");
 		assertEquals("123.3", var.get());
@@ -105,12 +106,12 @@ public class VarDataTest {
 	 * Проверка изменения типа данных и автоматического приведения текущего
 	 * значения к новому типу.
 	 * 
-	 * @see VarData#getType()
-	 * @see VarData#setType(DataType)
+	 * @see Var#getType()
+	 * @see Var#setType(DataType)
 	 */
 	@Test
 	public void testGetSetType() {
-		IVar var = new VarData("123.3");
+		IVar var = new Var("123.3");
 		assertEquals("123.3", var.get());
 		assertNull(var.getType());
 
@@ -122,13 +123,13 @@ public class VarDataTest {
 	/**
 	 * Проверка защиты значения от изменения.
 	 * 
-	 * @see VarData#get()
-	 * @see VarData#set(Object)
-	 * @see VarData#setReadOnly(boolean)
+	 * @see Var#get()
+	 * @see Var#set(Object)
+	 * @see Var#setReadOnly(boolean)
 	 */
 	@Test
 	public void testGetSetReadonly() {
-		VarData var = new VarData("123.3");
+		Var var = new Var("123.3");
 		assertEquals("123.3", var.get());
 		assertFalse(var.isReadOnly());
 
