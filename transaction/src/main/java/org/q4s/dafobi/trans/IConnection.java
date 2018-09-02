@@ -21,9 +21,23 @@ package org.q4s.dafobi.trans;
 import java.util.Map;
 
 import org.q4s.dafobi.common.DataParam;
-import org.q4s.dafobi.exception.TransactionException;
+import org.q4s.dafobi.exception.DataException;
 
-public interface ITransaction extends AutoCloseable {
+/**
+ * Данный интерфейс представляет методы, предназначенные для запуска операций по
+ * обработке данных. Данный интерфейс не привязан непосредственно к базам
+ * данных, и может быть как реализацией JDBC доступа, так и какого-нибудь
+ * альтернативного механизма (вроде сетевого). Но, внезависимости от реализации,
+ * общий подход по работе с данными сводится к следующему. Данные выбираются
+ * таблично. Параметры, передаваемые данным имеют символьные имена. Построчный
+ * возврат данных тоже происходит через символьные имена колонок. Данные
+ * сохраняются в рамках транзакции (если что-то пошло не так, то можно все
+ * откатить).
+ * 
+ * @author Q4S
+ *
+ */
+public interface IConnection extends AutoCloseable {
 
 	/**
 	 * Предварительная подготовка запроса. Как правило в нее входит
@@ -34,7 +48,7 @@ public interface ITransaction extends AutoCloseable {
 	 * 
 	 * @return Подготовленный к дальнейшей работе оператор.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public IStatement prepare(final String statement);
@@ -59,40 +73,33 @@ public interface ITransaction extends AutoCloseable {
 	 * 
 	 * @return Количество затронутых запросом строк.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public int execute(final String statement, final Map<String, DataParam> parameters);
 
 	/**
-	 * Часто бывает желательно выполнить не один оператор, а сразу несколько,
+	 * Иногда бывает желательно выполнить не один оператор, а сразу несколько
 	 * объединенных в один текстовый файл (такой файл называется скриптом).
-	 * 
-	 * <pre>
-	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	int count = stmt.execute(params);
-	 * 	...
-	 * }
-	 * </pre>
 	 * 
 	 * @see IStatement#execute(Map)
 	 * 
 	 * @param script
 	 *            Текст скрипта, который надо будет выполнить. Один скрипт может
 	 *            содержать несколько операторов, которые будут выполняться в
-	 *            порядке следования.
+	 *            рамках одной транзакции в порядке их следования.
 	 * 
 	 * @param parameters
 	 *            Значения параметров, с которыми будут выполняться все
-	 *            операторы. Если оператор представляет собой вызов процедуры с
-	 *            выходными параметрами, то значения выходных параметров будут
-	 *            записаны в карту и смогут впоследствии быть использованы
-	 *            следующими по порядку операторами.
+	 *            операторы. Если какой-то из операторов представляет собой
+	 *            вызов процедуры с выходными параметрами, то значения выходных
+	 *            параметров будут записаны в карту и могут впоследствии быть
+	 *            использованы следующими по порядку операторами.
 	 * 
 	 * @return Количество затронутых каждым из операторов строк. Если оператор
 	 *         представляет собой вызов процедуры, то количество равно 0.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public int[] executeScript(final String script, final Map<String, DataParam> parameters);
@@ -101,23 +108,26 @@ public interface ITransaction extends AutoCloseable {
 	 * Сокращенная версия кода:
 	 * 
 	 * <pre>
-	 * try (IStatement stmt = transaction.prepare(sql);) {
-	 * 	IResultTable rt = stmt.query(params);
+	 * IStatement stmt = transaction.prepare(sql);
+	 * IResultTable rt = stmt.query(params);
 	 * 	...
-	 * }
 	 * </pre>
+	 * 
+	 * Во избежании утечки ресурсов обязательно закрывайте возвращаемый набор
+	 * данных после его обработки. При этом так же будет освобожден породивший
+	 * этот набор оператор.
 	 * 
 	 * @see IStatement#query(Map)
 	 * 
 	 * @param statement
-	 *            Текст оператора, который надо будет выполнить.
+	 *            Текст оператора, который надо выполнить.
 	 * 
 	 * @param parameters
 	 *            Значения параметров, с которыми выполняется запрос.
 	 * 
 	 * @return Табличный набор данных.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public IResultTable query(final String statement, final Map<String, DataParam> parameters);
@@ -141,7 +151,7 @@ public interface ITransaction extends AutoCloseable {
 	 * @return Первая строка, которую вернул запрос. Если оператор не вернул
 	 *         ничего, то значение будет null.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public IRow queryRow(final String statement, final Map<String, DataParam> parameters);
@@ -152,7 +162,7 @@ public interface ITransaction extends AutoCloseable {
 	 *            каждого оператора; false - приводит к тому, что commit надо
 	 *            будет вызывать вручную с помощью метода {@link #commit()}.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public void setAutocommit(boolean flag);
@@ -161,7 +171,7 @@ public interface ITransaction extends AutoCloseable {
 	 * @return true - если commit делается после каждого оператора; false - если
 	 *         commit надо вызывать вручную с помощью метода {@link #commit()}.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public boolean getAutocommit();
@@ -170,7 +180,7 @@ public interface ITransaction extends AutoCloseable {
 	 * Подтверждение сделанных в рамках транзакции изменений. После этого они
 	 * становятся постоянными.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public void commit();
@@ -179,7 +189,7 @@ public interface ITransaction extends AutoCloseable {
 	 * Отмена всех сделанных в рамках транзакции изменений. Данные возвращаются
 	 * к состоянию, в котором они были до начала всех изменений.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public void rollback();
@@ -192,5 +202,8 @@ public interface ITransaction extends AutoCloseable {
 	@Override
 	public void close();
 
+	/**
+	 * @deprecated Назначение оператора пока непонятно.
+	 */
 	public void getLastError();
 }

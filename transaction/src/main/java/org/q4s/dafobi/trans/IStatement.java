@@ -22,7 +22,7 @@ import java.sql.Statement;
 import java.util.Map;
 
 import org.q4s.dafobi.common.DataParam;
-import org.q4s.dafobi.exception.TransactionException;
+import org.q4s.dafobi.exception.DataException;
 import org.q4s.dafobi.jaxb.common.DataType;
 
 /**
@@ -49,7 +49,7 @@ public interface IStatement extends AutoCloseable {
 	 * 
 	 * @return the query results
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public IResultTable query();
@@ -71,7 +71,7 @@ public interface IStatement extends AutoCloseable {
 	 * 
 	 * @return the query results
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public IResultTable query(final Map<String, DataParam> parameters);
@@ -97,7 +97,7 @@ public interface IStatement extends AutoCloseable {
 	 *         statements or (2) 0 for statements that return nothing or
 	 *         procedures and functions.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public int execute();
@@ -124,7 +124,7 @@ public interface IStatement extends AutoCloseable {
 	 *         statements or (2) 0 for statements that return nothing or
 	 *         procedures and functions.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 */
 	public int execute(final Map<String, DataParam> parameters);
@@ -132,7 +132,7 @@ public interface IStatement extends AutoCloseable {
 	/**
 	 * Adds the current set of parameters as a batch entry.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if something went wrong
 	 */
 	public void addBatch();
@@ -153,7 +153,7 @@ public interface IStatement extends AutoCloseable {
 	 *            (INOUT). Если такая трактовка не верна, то следует
 	 *            воспользоваться методом {@link #addBatch()}.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if something went wrong
 	 */
 	public void addBatch(final Map<String, DataParam> parameters);
@@ -166,7 +166,7 @@ public interface IStatement extends AutoCloseable {
 	 * @return update counts for each statement or 0s if thouse are procedure
 	 *         calls.
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if something went wrong
 	 */
 	public int[] executeBatch();
@@ -204,7 +204,7 @@ public interface IStatement extends AutoCloseable {
 	 * @param value
 	 *            parameter value
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 * 
 	 * @throws IllegalArgumentException
@@ -221,7 +221,7 @@ public interface IStatement extends AutoCloseable {
 	 * @param value
 	 *            parameter value
 	 * 
-	 * @throws TransactionException
+	 * @throws DataException
 	 *             if an error occurred
 	 * 
 	 * @throws IllegalArgumentException

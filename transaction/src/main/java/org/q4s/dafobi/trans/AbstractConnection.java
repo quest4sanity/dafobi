@@ -29,7 +29,7 @@ import org.q4s.dafobi.common.DataParam;
  * 
  * @author Q4S
  */
-public abstract class AbstractTransaction implements ITransaction {
+public abstract class AbstractConnection implements IConnection {
 
 	/*
 	 * (non-Javadoc)

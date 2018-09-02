@@ -19,7 +19,7 @@
 package org.q4s.dafobi.trans.jdbc.oracle;
 
 import org.q4s.dafobi.trans.jdbc.JdbcStatement;
-import org.q4s.dafobi.trans.jdbc.JdbcTransaction;
+import org.q4s.dafobi.trans.jdbc.JdbcConnection;
 
 /**
  * Oracle в отличии от стандартного JDBC умеет работать с DECLARE-BEGIN-END
@@ -36,7 +36,7 @@ public class OracleJdbcStatement extends JdbcStatement {
 	 * @param transaction
 	 * @param query
 	 */
-	public OracleJdbcStatement(JdbcTransaction transaction, String query) {
+	public OracleJdbcStatement(JdbcConnection transaction, String query) {
 		super(transaction, query);
 	}
 

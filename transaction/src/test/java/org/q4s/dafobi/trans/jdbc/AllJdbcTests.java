@@ -27,7 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		JdbcResultTableTest.class, //
 		JdbcStatementInternalTest.class, //
 		JdbcStatementTest.class, //
-		JdbcTransactionTest.class })
+		JdbcConnectionTest.class })
 public class AllJdbcTests {
 
 }

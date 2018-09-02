@@ -4,12 +4,12 @@ import java.sql.SQLException;
 
 /**
  * Исключительная ситуация, возникающая из-за ошибок во время выполнения
- * операторов транзакции.
+ * операторов обработке данных (получения, сохранения).
  * 
  * @author Q4S
  * 
  */
-public class TransactionException extends RuntimeException {
+public class DataException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public class TransactionException extends RuntimeException {
 	 * @param e
 	 *            Исключение, возникшее в процессе выполнения транзакции.
 	 */
-	public TransactionException(SQLException e) {
+	public DataException(SQLException e) {
 		this(e.getSQLState(), e.getErrorCode(), e.getMessage(), null);
 	}
 
@@ -54,11 +54,11 @@ public class TransactionException extends RuntimeException {
 	 * @param operator
 	 *            Оператор, вызвавший исключительную ситуацию.
 	 */
-	public TransactionException(SQLException e, String operator) {
+	public DataException(SQLException e, String operator) {
 		this(e.getSQLState(), e.getErrorCode(), e.getMessage(), operator);
 	}
 
-	public TransactionException(String state, int errorCode, String message, String operator) {
+	public DataException(String state, int errorCode, String message, String operator) {
 		super();
 
 		this.state = state;

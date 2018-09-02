@@ -21,15 +21,15 @@ package org.q4s.dafobi.trans.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.q4s.dafobi.exception.TransactionException;
-import org.q4s.dafobi.trans.AbstractTransaction;
+import org.q4s.dafobi.exception.DataException;
+import org.q4s.dafobi.trans.AbstractConnection;
 import org.q4s.dafobi.trans.IStatement;
 
-public class JdbcTransaction extends AbstractTransaction {
+public class JdbcConnection extends AbstractConnection {
 
 	private final Connection connection;
 
-	public JdbcTransaction(Connection connection) {
+	public JdbcConnection(Connection connection) {
 		this.connection = connection;
 	}
 
@@ -62,7 +62,7 @@ public class JdbcTransaction extends AbstractTransaction {
 			connection.setAutoCommit(autoCommit);
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class JdbcTransaction extends AbstractTransaction {
 			return connection.getAutoCommit();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 
@@ -92,7 +92,7 @@ public class JdbcTransaction extends AbstractTransaction {
 			connection.commit();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class JdbcTransaction extends AbstractTransaction {
 			connection.rollback();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 

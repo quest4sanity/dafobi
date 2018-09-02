@@ -48,20 +48,20 @@ import org.junit.Test;
  */
 public class JdbcStatementInternalTest {
 
-	private static Connection connection = null;
+	private static Connection jdbcConnection = null;
 
-	JdbcTransaction transaction;
+	JdbcConnection connection;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
+		jdbcConnection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
 		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_create.sql");
 
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -70,19 +70,19 @@ public class JdbcStatementInternalTest {
 	public static void tearDownAfterClass() throws Exception {
 		String dropTable = "DROP TABLE TEST";
 		// Dropping the table
-		try (PreparedStatement stmt = connection.prepareStatement(dropTable);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropTable);) {
 			stmt.execute();
 		}
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		transaction = new JdbcTransaction(connection);
+		connection = new JdbcConnection(jdbcConnection);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		transaction.close();
+		connection.close();
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class JdbcStatementInternalTest {
 	 */
 	@Test
 	public void testSimpleSelectQuery() {
-		try (JdbcStatement statement = (JdbcStatement) transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+		try (JdbcStatement statement = (JdbcStatement) connection.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 
 			assertEquals("SELECT * FROM TEST WHERE ID = ?", statement.getParsedQuery());
 			assertEquals("SELECT * FROM TEST WHERE ID = ?", statement.getProcessedQuery());
@@ -106,7 +106,7 @@ public class JdbcStatementInternalTest {
 	 */
 	@Test
 	public void testMediumSelectQuery() {
-		try (JdbcStatement statement = (JdbcStatement) transaction.prepare("/* Шапка запроса*/\r\n"//
+		try (JdbcStatement statement = (JdbcStatement) connection.prepare("/* Шапка запроса*/\r\n"//
 				+ "SELECT * FROM TEST\r\n" //
 				+ "WHERE ID = :id1 OR ID = :id2 OR ID = :id3");) {
 

@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.q4s.dafobi.common.DataParam;
-import org.q4s.dafobi.exception.TransactionException;
+import org.q4s.dafobi.exception.DataException;
 import org.q4s.dafobi.jaxb.common.DataType;
 import org.q4s.dafobi.trans.AbstractStatement;
 import org.q4s.dafobi.trans.IResultTable;
@@ -53,7 +53,7 @@ import org.q4s.dafobi.trans.IStatement;
  */
 public class JdbcStatement extends AbstractStatement {
 
-	private final JdbcTransaction transaction;
+	private final JdbcConnection transaction;
 
 	/**
 	 * The statement this object is wrapping.
@@ -91,7 +91,7 @@ public class JdbcStatement extends AbstractStatement {
 	 * @param transaction
 	 * @param query
 	 */
-	public JdbcStatement(final JdbcTransaction transaction, final String query) {
+	public JdbcStatement(final JdbcConnection transaction, final String query) {
 		try {
 			this.transaction = transaction;
 
@@ -125,7 +125,7 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
+			throw new DataException(e, getProcessedQuery());
 		}
 	}
 
@@ -480,7 +480,7 @@ public class JdbcStatement extends AbstractStatement {
 			statement.close();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 
@@ -495,7 +495,7 @@ public class JdbcStatement extends AbstractStatement {
 			return statement.isClosed();
 
 		} catch (SQLException e) {
-			throw new TransactionException(e);
+			throw new DataException(e);
 		}
 	}
 
@@ -521,7 +521,7 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
+			throw new DataException(e, getProcessedQuery());
 		}
 	}
 
@@ -542,7 +542,7 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
+			throw new DataException(e, getProcessedQuery());
 		}
 	}
 
@@ -564,7 +564,7 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
+			throw new DataException(e, getProcessedQuery());
 		}
 	}
 
@@ -584,7 +584,7 @@ public class JdbcStatement extends AbstractStatement {
 			}
 
 		} catch (SQLException e) {
-			throw new TransactionException(e, getProcessedQuery());
+			throw new DataException(e, getProcessedQuery());
 		}
 	}
 

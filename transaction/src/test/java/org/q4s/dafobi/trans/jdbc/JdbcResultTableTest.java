@@ -23,9 +23,9 @@ import org.q4s.dafobi.trans.IStatement;
 
 public class JdbcResultTableTest {
 
-	private static Connection connection = null;
+	private static Connection jdbcConnection = null;
 
-	private JdbcTransaction transaction;
+	private JdbcConnection connection;
 
 	/**
 	 * 
@@ -35,11 +35,11 @@ public class JdbcResultTableTest {
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
+		jdbcConnection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
 		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcResultTest_create.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -52,7 +52,7 @@ public class JdbcResultTableTest {
 	public static void tearDownAfterClass() throws Exception {
 		// Dropping the table
 		String dropTable = "DROP TABLE TEST";
-		try (PreparedStatement stmt = connection.prepareStatement(dropTable);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropTable);) {
 			stmt.execute();
 		}
 	}
@@ -65,7 +65,7 @@ public class JdbcResultTableTest {
 	@Before
 	public void setUp() throws Exception {
 		// Adding rows into the table
-		try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
+		try (PreparedStatement insertStatement = jdbcConnection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(?, ?, ?)")) {
 
 			insertStatement.setInt(1, new Integer(1));
@@ -80,7 +80,7 @@ public class JdbcResultTableTest {
 
 			insertStatement.executeBatch();
 		}
-		transaction = new JdbcTransaction(connection);
+		connection = new JdbcConnection(jdbcConnection);
 	}
 
 	/**
@@ -91,11 +91,11 @@ public class JdbcResultTableTest {
 	@After
 	public void tearDown() throws Exception {
 		// Cleaning the table
-		try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM TEST");) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement("DELETE FROM TEST");) {
 			stmt.executeUpdate();
 		}
 
-		transaction.close();
+		connection.close();
 	}
 
 	/**
@@ -104,13 +104,13 @@ public class JdbcResultTableTest {
 	@Test
 	public void testResultTable() {
 		String query = "SELECT * as c FROM TEST";
-		try (IStatement statement = transaction.prepare(query);) {
+		try (IStatement statement = connection.prepare(query);) {
 			IResultTable result = statement.query();
 
 			assertEquals(3, result.count());
 			assertEquals(DataType.INTEGER, result.getColumnType(0));
 			assertEquals(DataType.STRING, result.getColumnType(1));
-			assertEquals(DataType.DATETIME, result.getColumnType(2));
+			assertEquals(DataType.TIMESTAMP, result.getColumnType(2));
 
 			assertEquals("id", result.getColumnName(0));
 			assertEquals("str", result.getColumnName(1));

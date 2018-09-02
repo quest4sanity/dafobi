@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -50,9 +51,9 @@ import org.q4s.dafobi.trans.IStatement;
  */
 public class JdbcStatementTest {
 
-	private static Connection connection = null;
+	private static Connection jdbcConnection = null;
 
-	private JdbcTransaction transaction;
+	private JdbcConnection connection;
 
 	/**
 	 * 
@@ -62,23 +63,23 @@ public class JdbcStatementTest {
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
+		jdbcConnection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
 		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_create.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 
 		// Creating the procedure
 		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 
 		// Creating second the procedure
 		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcStatementTest_proc_query.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -91,18 +92,18 @@ public class JdbcStatementTest {
 	public static void tearDownAfterClass() throws Exception {
 		// Dropping procedures
 		String dropProc = "DROP PROCEDURE test_out_param";
-		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropProc);) {
 			stmt.execute();
 		}
 		
 		dropProc = "DROP PROCEDURE test_cursor";
-		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropProc);) {
 			stmt.execute();
 		}
 		
 		// Dropping the table
 		String dropTable = "DROP TABLE TEST";
-		try (PreparedStatement stmt = connection.prepareStatement(dropTable);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropTable);) {
 			stmt.execute();
 		}
 	}
@@ -115,7 +116,7 @@ public class JdbcStatementTest {
 	@Before
 	public void setUp() throws Exception {
 		// Adding rows into the table
-		try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
+		try (PreparedStatement insertStatement = jdbcConnection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(?, ?, ?)")) {
 
 			insertStatement.setInt(1, new Integer(1));
@@ -130,7 +131,7 @@ public class JdbcStatementTest {
 			
 			insertStatement.executeBatch();
 		}
-		transaction = new JdbcTransaction(connection);
+		connection = new JdbcConnection(jdbcConnection);
 	}
 
 	/**
@@ -141,11 +142,11 @@ public class JdbcStatementTest {
 	@After
 	public void tearDown() throws Exception {
 		// Cleaning the table
-		try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM TEST");) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement("DELETE FROM TEST");) {
 			stmt.executeUpdate();
 		}
 
-		transaction.close();
+		connection.close();
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class JdbcStatementTest {
 	 * @return Первая строка данных, возвращенная запросом.
 	 */
 	private IRow getOneRow(String query) {
-		try (IStatement statement = transaction.prepare(query);) {
+		try (IStatement statement = connection.prepare(query);) {
 			IResultTable result = statement.query();
 			for (IRow row : result) {
 				return row;
@@ -186,7 +187,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQueryById() {
-		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+		try (IStatement statement = connection.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 			statement.setParam("id", DataType.LONG.param(2l));
 			try (IResultTable result = statement.query();) {
 
@@ -209,7 +210,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQueryByIdProc() {
-		try (IStatement statement = transaction.prepare("{call test_cursor(:id)}");) {
+		try (IStatement statement = connection.prepare("{call test_cursor(:id)}");) {
 			statement.setParam("id", DataType.LONG.param(2l));
 			try (IResultTable result = statement.query();) {
 
@@ -232,7 +233,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQueryManyRows() {
-		try (IStatement statement = transaction.prepare("SELECT * FROM TEST");
+		try (IStatement statement = connection.prepare("SELECT * FROM TEST");
 				IResultTable result = statement.query();) {
 
 			int i = 0;
@@ -258,7 +259,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testQueryMapOfStringObject() {
-		try (IStatement statement = transaction.prepare("SELECT * FROM TEST WHERE ID = :id");) {
+		try (IStatement statement = connection.prepare("SELECT * FROM TEST WHERE ID = :id");) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();
 			params.put("id", DataType.INTEGER.param(2));
 			try (IResultTable result = statement.query(params);) {
@@ -282,7 +283,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecute() {
-		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
+		try (IStatement statement = connection.prepare("{call test_out_param( &outp, :inp)}")) {
 			statement.setParam("inp", DataType.INTEGER.param(13));
 			statement.setParam("outp", DataType.INTEGER.param(0));
 			statement.execute();
@@ -295,10 +296,12 @@ public class JdbcStatementTest {
 	/**
 	 * Test method for
 	 * {@link org.q4s.dafobi.trans.AbstractStatement#execute(java.util.Map)}
+	 * 
+	 * @throws ParseException
 	 */
 	@Test
-	public void testExecuteMapOfStringObject() {
-		try (IStatement statement = transaction.prepare("{call test_out_param( &outp, :inp)}")) {
+	public void testExecuteMapOfStringObject() throws ParseException {
+		try (IStatement statement = connection.prepare("{call test_out_param( &outp, :inp)}")) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();
 			params.put("inp", DataType.INTEGER.param(13));
 			params.put("outp", DataType.INTEGER.param(0));
@@ -316,7 +319,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteUpdate() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+		try (IStatement statement = connection.prepare("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)")) {
 			statement.setParam("id", DataType.INTEGER.param(10));
 			statement.setParam("str", DataType.STRING.param("Str 10"));
@@ -333,7 +336,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteUpdateMapOfStringObject() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+		try (IStatement statement = connection.prepare("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)")) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();
 			params.put("id", DataType.INTEGER.param(10));
@@ -352,7 +355,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteBatch() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+		try (IStatement statement = connection.prepare("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)");) {
 			statement.setParam("id", DataType.INTEGER.param(10));
 			statement.setParam("str", DataType.STRING.param("Str 10"));
@@ -376,7 +379,7 @@ public class JdbcStatementTest {
 	 */
 	@Test
 	public void testExecuteBatchMapOfStringObject() {
-		try (IStatement statement = transaction.prepare("INSERT INTO TEST(ID, STR, DT)" //
+		try (IStatement statement = connection.prepare("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)");) {
 			Map<String, DataParam> params = new TreeMap<String, DataParam>();
 			params.put("id", DataType.INTEGER.param(10));

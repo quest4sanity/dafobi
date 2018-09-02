@@ -42,17 +42,17 @@ import org.q4s.dafobi.trans.IResultTable;
 import org.q4s.dafobi.trans.IRow;
 
 /**
- * Тестирование методов класса {@link JdbcTransaction}, работающих
+ * Тестирование методов класса {@link JdbcConnection}, работающих
  * непосредственно с базой данных.
  * 
  * @author Q4S
  * 
  */
-public class JdbcTransactionTest {
+public class JdbcConnectionTest {
 
-	private static Connection connection = null;
+	private static Connection jdbcConnection = null;
 
-	private JdbcTransaction transaction;
+	private JdbcConnection connection;
 
 	/**
 	 * 
@@ -62,23 +62,23 @@ public class JdbcTransactionTest {
 	public static void setUpBeforeClass() throws Exception {
 		// Creating database server instance
 		// Driver: "org.hsqldb.jdbcDriver",
-		connection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
+		jdbcConnection = DriverManager.getConnection("jdbc:hsqldb:mem:" + UUID.randomUUID().toString(), "sa", "");
 
 		// Creating the table
-		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcTransactionTest_create.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcConnectionTest_create.sql");
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 
 		// Creating the procedure
-		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcTransactionTest_proc.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcConnectionTest_proc.sql");
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 
 		// Creating second the procedure
-		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcTransactionTest_proc_query.sql");
-				PreparedStatement stmt = connection.prepareStatement(IOUtils.toString(createTable));) {
+		try (InputStream createTable = HsqldbTest.class.getResourceAsStream("JdbcConnectionTest_proc_query.sql");
+				PreparedStatement stmt = jdbcConnection.prepareStatement(IOUtils.toString(createTable));) {
 			stmt.execute();
 		}
 	}
@@ -91,18 +91,18 @@ public class JdbcTransactionTest {
 	public static void tearDownAfterClass() throws Exception {
 		// Dropping procedures
 		String dropProc = "DROP PROCEDURE test_out_param";
-		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropProc);) {
 			stmt.execute();
 		}
 
 		dropProc = "DROP PROCEDURE test_cursor";
-		try (PreparedStatement stmt = connection.prepareStatement(dropProc);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropProc);) {
 			stmt.execute();
 		}
 
 		// Dropping the table
 		String dropTable = "DROP TABLE TEST";
-		try (PreparedStatement stmt = connection.prepareStatement(dropTable);) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement(dropTable);) {
 			stmt.execute();
 		}
 	}
@@ -115,7 +115,7 @@ public class JdbcTransactionTest {
 	@Before
 	public void setUp() throws Exception {
 		// Adding rows into the table
-		try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
+		try (PreparedStatement insertStatement = jdbcConnection.prepareStatement("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(?, ?, ?)")) {
 
 			insertStatement.setInt(1, new Integer(1));
@@ -130,7 +130,7 @@ public class JdbcTransactionTest {
 
 			insertStatement.executeBatch();
 		}
-		transaction = new JdbcTransaction(connection);
+		connection = new JdbcConnection(jdbcConnection);
 	}
 
 	/**
@@ -141,11 +141,11 @@ public class JdbcTransactionTest {
 	@After
 	public void tearDown() throws Exception {
 		// Cleaning the table
-		try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM TEST");) {
+		try (PreparedStatement stmt = jdbcConnection.prepareStatement("DELETE FROM TEST");) {
 			stmt.executeUpdate();
 		}
 
-		transaction.close();
+		connection.close();
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class JdbcTransactionTest {
 	 * @return Первая строка данных, возвращенная запросом.
 	 */
 	private IRow getOneRow(String query) {
-		IRow row = transaction.queryRow(query, new TreeMap<String, DataParam>());
+		IRow row = connection.queryRow(query, new TreeMap<String, DataParam>());
 		if (row == null) {
 			throw new RuntimeException("Запрос не вернул ни одной строки");
 		} else {
@@ -180,7 +180,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#query(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#query(String, Map)}
 	 * <p>
 	 * Пример получения одной строки (по ид.).
 	 */
@@ -188,7 +188,7 @@ public class JdbcTransactionTest {
 	public void testQueryById() {
 		Map<String, DataParam> parameters = new TreeMap<>();
 		parameters.put("id", DataType.LONG.param(2l));
-		try (IResultTable result = transaction.query("SELECT * FROM TEST WHERE ID = :id", parameters)) {
+		try (IResultTable result = connection.query("SELECT * FROM TEST WHERE ID = :id", parameters)) {
 			int i = 0;
 			for (IRow row : result) {
 				assertEquals(new Long(2), row.getInteger(0));
@@ -202,7 +202,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#query(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#query(String, Map)}
 	 * <p>
 	 * Пример получения одной строики (по ид.) с помощью процедуры.
 	 */
@@ -210,7 +210,7 @@ public class JdbcTransactionTest {
 	public void testQueryByIdProc() {
 		Map<String, DataParam> parameters = new TreeMap<>();
 		parameters.put("id", DataType.LONG.param(2l));
-		try (IResultTable result = transaction.query("{call test_cursor(:id)}", parameters)) {
+		try (IResultTable result = connection.query("{call test_cursor(:id)}", parameters)) {
 			int i = 0;
 			for (IRow row : result) {
 				assertEquals(new Long(2), row.getInteger(0));
@@ -224,13 +224,13 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#query(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#query(String, Map)}
 	 * <p>
 	 * Пример получения нескольких строк.
 	 */
 	@Test
 	public void testQueryManyRows() {
-		try (IResultTable result = transaction.query("SELECT * FROM TEST", new TreeMap<String, DataParam>())) {
+		try (IResultTable result = connection.query("SELECT * FROM TEST", new TreeMap<String, DataParam>())) {
 			int i = 0;
 			for (IRow row : result) {
 				if (i == 0) {
@@ -250,7 +250,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#execute(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#execute(String, Map)}
 	 * <p>
 	 * Проверяется вызов процедуры и возвращение ею параметров.
 	 */
@@ -259,7 +259,7 @@ public class JdbcTransactionTest {
 		Map<String, DataParam> parameters = new TreeMap<>();
 		parameters.put("inp", DataType.INTEGER.param(13));
 		parameters.put("outp", DataType.INTEGER.param(0));
-		int rc = transaction.execute("{call test_out_param( &outp, :inp)}", parameters);
+		int rc = connection.execute("{call test_out_param( &outp, :inp)}", parameters);
 
 		assertEquals(0, rc);
 		assertEquals(1311, ((DataParam) parameters.get("outp")).getValue());
@@ -267,7 +267,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#execute(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#execute(String, Map)}
 	 */
 	@Test
 	public void testExecuteUpdate() {
@@ -275,7 +275,7 @@ public class JdbcTransactionTest {
 		parameters.put("id", DataType.INTEGER.param(10));
 		parameters.put("str", DataType.STRING.param("Str 10"));
 		parameters.put("dt", DataType.DATE.param(new Date(2000)));
-		int rc = transaction.execute("INSERT INTO TEST(ID, STR, DT)" //
+		int rc = connection.execute("INSERT INTO TEST(ID, STR, DT)" //
 				+ "VALUES(:id, :str, :dt)", parameters);
 
 		assertEquals(1, rc);
@@ -284,7 +284,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#executeScript(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#executeScript(String, Map)}
 	 * 
 	 * @throws IOException
 	 */
@@ -292,9 +292,9 @@ public class JdbcTransactionTest {
 	public void testExecuteScript() throws IOException {
 		Map<String, DataParam> parameters = new TreeMap<>();
 		parameters.put("id", DataType.INTEGER.param(10));
-		try (InputStream stream = HsqldbTest.class.getResourceAsStream("JdbcTransactionTest_script.sql")) {
+		try (InputStream stream = HsqldbTest.class.getResourceAsStream("JdbcConnectionTest_script.sql")) {
 			String script = IOUtils.toString(stream);
-			int[] rc = transaction.executeScript(script, parameters);
+			int[] rc = connection.executeScript(script, parameters);
 
 			Assert.assertArrayEquals(new int[] { 2, 4, 1 }, rc);
 			assertEquals(7l, getRowCount());
@@ -303,7 +303,7 @@ public class JdbcTransactionTest {
 
 	/**
 	 * Test method for
-	 * {@link org.q4s.dafobi.trans.jdbc.JdbcTransaction#executeScript(String, Map)}
+	 * {@link org.q4s.dafobi.trans.jdbc.JdbcConnection#executeScript(String, Map)}
 	 * 
 	 * @throws IOException
 	 */
@@ -312,9 +312,9 @@ public class JdbcTransactionTest {
 		Map<String, DataParam> parameters = new TreeMap<>();
 		parameters.put("inp", DataType.INTEGER.param(13));
 		parameters.put("outp", DataType.INTEGER.param(0));
-		try (InputStream stream = HsqldbTest.class.getResourceAsStream("JdbcTransactionTest_script_proc.sql")) {
+		try (InputStream stream = HsqldbTest.class.getResourceAsStream("JdbcConnectionTest_script_proc.sql")) {
 			String script = IOUtils.toString(stream);
-			int[] rc = transaction.executeScript(script, parameters);
+			int[] rc = connection.executeScript(script, parameters);
 
 			Assert.assertArrayEquals(new int[] { 0, 0, 0 }, rc);
 
