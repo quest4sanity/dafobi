@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.q4s.dafobi</groupId>
-	<artifactId>dataform</artifactId>
+	<artifactId>data</artifactId>
 
 	<parent>
 		<groupId>org.q4s</groupId>
@@ -10,8 +10,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>Реализация функционала форм данных</name>
-	<description>Модуль работы с локальными хранилищами данных и формами данных.</description>
+	<name>Реализация функционала транзакций</name>
+	<description>Средство, обеспечивающее работу с транзакциями.</description>
 
 	<licenses>
 		<license>
@@ -28,23 +28,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.q4s.dafobi</groupId>
-			<artifactId>data</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.q4s.dafobi</groupId>
-			<artifactId>variables</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
 		</dependency>
 
 		<dependency>
@@ -57,13 +42,6 @@
 			<artifactId>jaxb-impl</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -101,36 +79,36 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<configuration>
-					<episodeFileName>dataform</episodeFileName>
-					<sources>
-						<source>${basedir}/src/main/java/org/q4s/dafobi/jaxb</source>
-						<source>${basedir}/../common/src/main/java/org/q4s/dafobi/jaxb</source>
-					</sources>
-					<transformSchemas>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:common</uri>
-							<toPrefix>c</toPrefix>
-							<toFile>common.xsd</toFile>
-						</transformSchema>
-						<transformSchema>
-							<uri>urn:q4s:dafobi:dataform</uri>
-							<toPrefix>d</toPrefix>
-							<toFile>dataform.xsd</toFile>
-						</transformSchema>
-					</transformSchemas>
-					<!-- <xsdPathWithinArtifact>generated/xsd</xsdPathWithinArtifact> -->
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/test.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>production</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/production.properties</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -19,7 +19,8 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>common</module>
-		<module>transaction</module>
+		<module>data</module>
+		<module>data_proc</module>
 		<module>dataform</module>
 		<module>variables</module>
 		<module>dfbfaces</module>
@@ -54,7 +55,13 @@
 
 			<dependency>
 				<groupId>org.q4s.dafobi</groupId>
-				<artifactId>transaction</artifactId>
+				<artifactId>data</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.q4s.dafobi</groupId>
+				<artifactId>data_proc</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
